@@ -57,7 +57,14 @@ def generate_adaptive_grid(
     assert len(gps_range) == 2, 'The format of gps_range is wrong!'
 
     def cal_point_idx(_point, _n_grid=n_top_grid, _step=None, _base=None):
-        """cal the idx of point in grid"""
+        """
+        cal the idx of point in grid
+        :param _point: the point which need to caled
+        :param _n_grid: the number of grid
+        :param _step: the gird block length
+        :param _base: the bias or basic of the point
+        :return:
+        """
         idx = grid_boundary_judge(int((_point[0]-_base['lat']) / _step['lat']), _n_grid) * _n_grid \
             + grid_boundary_judge(int((_point[1]-_base['lon']) / _step['lon']), _n_grid)
 
