@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*-coding:utf-8-*-
 # Author: nomalocaris <nomalocaris.top>
-""""""
+"""
+    progress bar module
+"""
 from __future__ import (absolute_import, unicode_literals)
 import time
 
