@@ -17,7 +17,7 @@ n_grid = generate_adaptive_grid(
     epsilon_alloc=epsilon_alloc['ag'],
     epsilon_tot=epsilon,
     gps_range=gps_range,
-    add_noise=True,
+    add_noise=False,
     beta_factor=beta_factor,
     is_plot=False
 )
