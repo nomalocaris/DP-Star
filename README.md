@@ -8,4 +8,20 @@ none
 
 ### Usage
 
-none
+#### overall call files
+
+The files for call is **config.py** and **main.py**
+
+In **config.py**, you can set the parmeter to set the middlewave file paths, privacy budget and etc.
+
+In **main.py**, you can call the func in dpstar and utils modules.
+
+### DP-Star components
+
+#### adaptive grid construction
+
+The main func is *generate_adaptive_grid*, you can see the params and desc in the dpstar modules.
+
+We usually foucs on the beta parm, which will significantly affect the grid partition.
+
+If you set the *add_noise* equals to False, you can see the true distribution of trajectories.
