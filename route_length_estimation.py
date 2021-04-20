@@ -19,7 +19,7 @@ from utils import ProgressBar
 def exp_mechanism(score, m, epsilon, sensitivity):
     """
 
-    指数机制，选出一个符合定义的下标，不用检查
+    指数机制，选出一个符合定义的下标
 
     Args:
         score:
@@ -133,8 +133,10 @@ def main(trip_file, out_file, A, epsilon):
                     f_out.writelines(star)
                     star = ''
 
+    print(maxT)
+
     return maxT
 
 
 if __name__ == '__main__':
-    main('data/Geolife Trajectories 1.3/middleware/grid_traj.txt', 'data/Geolife Trajectories 1.3/middleware/length_traj.txt', 18, 8 / 9)
+    main('data/Geolife Trajectories 1.3/middleware/grid_traj.txt', 'data/Geolife Trajectories 1.3/middleware/length_traj_Giyn.txt', 1012, 3 / 9)
