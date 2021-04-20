@@ -139,4 +139,5 @@ def main(trip_file, out_file, A, epsilon):
 
 
 if __name__ == '__main__':
-    main('../data/Geolife Trajectories 1.3/middleware/grid_traj.txt', 'data/Geolife Trajectories 1.3/middleware/length_traj_Giyn.txt', 1012, 3 / 9)
+    main('../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
+         'data/Geolife Trajectories 1.3/middleware/length_traj_Giyn.txt', 1012, 3 / 9)
