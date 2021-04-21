@@ -8,9 +8,6 @@ none
 
 ### Usage
 
-<<<<<<< HEAD
-none
-=======
 #### overall call files
 
 The files for call is **config.py** and **main.py**
