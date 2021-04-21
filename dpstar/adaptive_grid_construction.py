@@ -11,6 +11,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def read_mdl_data(idir_traj):
+    """Read the mdl data according to the idir_path
+    """
+    # get the traj files
+    traj_files = os.listdir(idir_traj)
+    assert len(traj_files) > 0, 'There is no trajectory.'
+
+    # read trajs
+    trajs = []
+    for traj_file in traj_files:
+        with open(idir_traj + '/' + traj_file) as f_mdl_traj:
+            # _traj = [list(map(float, _point.replace('\n', '').split(','))) for _point in f_mdl_traj.readlines()]
+            _traj = [eval(_point) for _point in f_mdl_traj.readlines()]
+            trajs.append(_traj)
+
+    return trajs
+
+
 def generate_adaptive_grid(
         idir_traj, opath_top_grid, opath_grid_traj, opath_grid_block_gps_range, epsilon_alloc, epsilon_tot, gps_range,
         n_top_grid=7, add_noise=True, is_plot=False, beta_factor=80
@@ -30,22 +48,6 @@ def generate_adaptive_grid(
     :param beta_factor:
     :return:
     """
-
-    def read_mdl_data():
-        """Read the mdl data according to the idir_path
-        """
-        # get the traj files
-        traj_files = os.listdir(idir_traj)
-        assert len(traj_files) > 0, 'There is no trajectory.'
-
-        # read trajs
-        trajs = []
-        for traj_file in traj_files:
-            with open(idir_traj + '/' + traj_file) as f_mdl_traj:
-                _traj = [list(map(float, _point.replace('\n', '').split(','))) for _point in f_mdl_traj.readlines()]
-                trajs.append(_traj)
-
-        return trajs
 
     def grid_boundary_judge(cal_grid_idx, boundary=n_top_grid):
         """judge the calculated gird idx is out of the grid boundary
@@ -70,7 +72,7 @@ def generate_adaptive_grid(
 
         return idx
 
-    tot_traj = read_mdl_data()
+    tot_traj = read_mdl_data(idir_traj)
     # grid parm according to the paper.
     beta = (epsilon_tot - epsilon_alloc) / beta_factor
     # the block num of top gird
@@ -105,12 +107,52 @@ def generate_adaptive_grid(
             # rounding
             M[i] = int(np.rint(M[i]))
 
+    # cal the grid range
+    grid_block_gps_range = {}
+    for i in range(C):
+        current_idx = 0
+        for j in range(i):
+            # get the current idx
+            current_idx += M[j] ** 2
+        # if there is only one grid.
+        if M[i] == 1:
+            row = i // n_top_grid
+            col = i - row * n_top_grid
+            grid_block_gps_range[current_idx] = (
+                ((row * top_block_gps_step['lat'] + gps_range['lat'][0],
+                  col * top_block_gps_step['lon'] + gps_range['lon'][0]),
+                 ((row + 1) * top_block_gps_step['lat'] + gps_range['lat'][0],
+                  (col + 1) * top_block_gps_step['lon'] + gps_range['lon'][0]))
+            )
+        # if there are not only one grid.
+        else:
+            row = i // n_top_grid
+            col = i - row * n_top_grid
+            start_point = (row * top_block_gps_step['lat'] + gps_range['lat'][0],
+                           col * top_block_gps_step['lon'] + gps_range['lon'][0])
+            end_point = ((row + 1) * top_block_gps_step['lat'] + gps_range['lat'][0],
+                         (col + 1) * top_block_gps_step['lon'] + gps_range['lon'][0])
+            for k in range(M[i]**2):
+                bottom_block_gps_step = {
+                    'lat': (end_point[0] - start_point[0]) / M[i],
+                    'lon': (end_point[1] - start_point[1]) / M[i]
+                }
+                row = k // M[i]
+                col = k - row * M[i]
+                grid_block_gps_range[current_idx+k] = (
+                    ((row * bottom_block_gps_step['lat'] + start_point[0],
+                      col * bottom_block_gps_step['lon'] + start_point[1]),
+                     ((row + 1) * bottom_block_gps_step['lat'] + start_point[0],
+                      (col + 1) * bottom_block_gps_step['lon'] + start_point[1]))
+                )
+
+    # print(grid_block_gps_range)
     # cal the top grid range
-    grid_block_gps_range = []
+    top_grid_block_gps_range = []
     for i in range(C):
         row = i // n_top_grid
         col = i - row * n_top_grid
-        grid_block_gps_range.append(
+        top_grid_block_gps_range.append(
             ((row * top_block_gps_step['lat'] + gps_range['lat'][0],
               col * top_block_gps_step['lon'] + gps_range['lon'][0]),
              ((row + 1) * top_block_gps_step['lat'] + gps_range['lat'][0],
@@ -127,7 +169,8 @@ def generate_adaptive_grid(
     with open(opath_top_grid, 'w') as fw_top_grid:
         fw_top_grid.writelines(str(M))
     with open(opath_grid_block_gps_range, 'w') as fw_grid_block_range:
-        fw_grid_block_range.writelines(str(grid_block_gps_range))
+        fw_grid_block_range.write(str(grid_block_gps_range)+'\n')
+        fw_grid_block_range.write(str(top_grid_block_gps_range) + '\n')
 
     # map the traj into the grid
     p = utils.ProgressBar(len(tot_traj), '映射网格轨迹')
@@ -137,26 +180,27 @@ def generate_adaptive_grid(
         mapped_traj = []
         for point in tot_traj[i]:
             # cal the idx in the top grid
-            C_idx = cal_point_idx(point, _step=top_block_gps_step,
-                                  _base={'lon': gps_range['lon'][0], 'lat': gps_range['lat'][0]})
-
-            # cal the idx in the bottom grid
-            m = M[C_idx]
-            start_point = grid_block_gps_range[C_idx][0]
-            end_point = grid_block_gps_range[C_idx][1]
-            bottom_block_gps_step = {
-                'lat': (end_point[0] - start_point[0]) / m,
-                'lon': (end_point[1] - start_point[1]) / m
-            }
-            M_idx = cal_point_idx(point, _step=bottom_block_gps_step,
-                                  _base={'lat': start_point[0], 'lon': start_point[1]}, _n_grid=m)
-            for j in range(C_idx):
-                # add the privious bottom grid num.
-                M_idx += M[j] ** 2
-
-            mapped_traj.append(M_idx)
+            # C_idx = cal_point_idx(point, _step=top_block_gps_step,
+            #                       _base={'lon': gps_range['lon'][0], 'lat': gps_range['lat'][0]})
+            #
+            # # cal the idx in the bottom grid
+            # m = M[C_idx]
+            # for j in range(C_idx):
+            #     # add the privious bottom grid num.
+            #     C_idx += M[j] ** 2 if M[j] == 1 else M[j] ** 2 - 1
+            for k in range(n_grid):
+                grid_range = grid_block_gps_range[k]
+                if grid_range[1][0] >= point[0] >= grid_range[0][0] and \
+                   grid_range[1][1] >= point[1] >= grid_range[0][1]:
+                    mapped_traj.append(k)
 
         mapped_trajs.append(mapped_traj)
+
+    # # reverse map to grid
+    # reverse_mapped_trajs = []
+    # for traj in mapped_trajs:
+    #     reverse_mapped_trajs.append([np.mean(grid_block_gps_range[i], axis=0).tolist() for i in traj])
+    # print(reverse_mapped_trajs)
 
     # write to file
     with open(opath_grid_traj, 'w') as fw_grid_traj:
@@ -166,10 +210,11 @@ def generate_adaptive_grid(
     # plot the figure
     if is_plot:
         plt.figure(figsize=(6, 5))
-        for traj in tot_traj:
-            plt.plot([x[0] for x in traj], [y[1] for y in traj])
-            plt.scatter([x[0] for x in traj], [y[1] for y in traj])
-
+        p = utils.ProgressBar(len(tot_traj), '绘制网格轨迹图')
+        for i in range(len(tot_traj)):
+            p.update(i)
+            plt.plot([x[0] for x in tot_traj[i]], [y[1] for y in tot_traj[i]])
+            plt.scatter([x[0] for x in tot_traj[i]], [y[1] for y in tot_traj[i]])
         # plot top gird lines
         top_gird_lines = cal_split(
             (gps_range['lat'][0], gps_range['lat'][1]),
@@ -182,8 +227,8 @@ def generate_adaptive_grid(
         for i in range(C):
             if M[i] > 1:
                 bottom_grid_lines = cal_split(
-                    (grid_block_gps_range[i][0][0], grid_block_gps_range[i][1][0]),
-                    (grid_block_gps_range[i][0][1], grid_block_gps_range[i][1][1]),
+                    (top_grid_block_gps_range[i][0][0], top_grid_block_gps_range[i][1][0]),
+                    (top_grid_block_gps_range[i][0][1], top_grid_block_gps_range[i][1][1]),
                     M[i]
                 )
                 for line in bottom_grid_lines:
@@ -217,3 +262,46 @@ def cal_split(x_range, y_range, n_split):
                 (x_range[1], y_range[0] + y_range_step * i)
             )]
     return split_lines
+
+
+def generate_sd_grid_mapping_traj(
+    ipath_sd, n_top_grid, ipath_top_grid, ipath_grid_block_gps_range, odir_sd,
+    mapping_rate=1, mapping_bais=None
+):
+    """generate the gird-mapping traj for SD
+    """
+    # for pep8
+    if mapping_bais is None:
+        mapping_bais = {'lat': 0, 'lon': 0}
+
+    # privacy budget
+    with open(ipath_sd) as fr_sd:
+        sd = [eval(point.replace('\n', '')) for point in fr_sd.readlines()]
+    print(len(sd))
+    # C = n_top_grid ** 2
+    # with open(ipath_top_grid) as fr_top_grid:
+    #     M = eval(fr_top_grid.readline())
+
+    with open(ipath_grid_block_gps_range) as fr_top_grid_block_gps_range:
+        fstr = fr_top_grid_block_gps_range.readlines()
+        grid_block_gps_range = eval(fstr[0])
+        # top_grid_block_gps_range = eval(fstr[1])
+
+    reverse_mapped_trajs = []
+    for traj in sd:
+        print(traj)
+        reverse_mapped_trajs.append([list(np.mean(grid_block_gps_range[i], axis=0)) for i in traj])
+
+    # write to files
+    fcount = 0
+    for traj in reverse_mapped_trajs:
+        with open(odir_sd + '/sd_traj' + str(fcount) + '.txt', 'w') as fw_traj:
+            for point in traj:
+                # mapping
+                point = [point[0]/mapping_rate+mapping_bais['lat'], point[1]/mapping_rate+mapping_bais['lon']]
+                fw_traj.write(str(point[0])+','+str(point[1])+'\n')
+            fcount += 1
+
+
+
+
