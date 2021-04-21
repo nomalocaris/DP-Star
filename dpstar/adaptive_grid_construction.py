@@ -243,6 +243,7 @@ def generate_adaptive_grid(
 
         plt.savefig('grid_traj')
         plt.show()
+
     return n_grid
 
 

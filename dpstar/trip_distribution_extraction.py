@@ -14,6 +14,7 @@ import random
 
 import numpy as np
 
+from config import *
 from utils import ProgressBar
 from utils import signum
 
@@ -62,7 +63,7 @@ def trip_distribution(trajectory, N, epsilon):
     return R
 
 
-def main(trip_file, out_file, a, epsilon):
+def main(A, epsilon, trip_file=opath_grid_traj, out_file=r_path):
     """
 
     主函数
@@ -90,7 +91,7 @@ def main(trip_file, out_file, a, epsilon):
 
         with open(out_file, 'w') as f_trip:
             count = 0
-            for item in trip_distribution(T_all, a, epsilon):
+            for item in trip_distribution(T_all, A, epsilon):
                 line_str = ''
                 for item2 in item:
                     line_str += str(item2) + ' '
@@ -100,5 +101,4 @@ def main(trip_file, out_file, a, epsilon):
 
 
 if __name__ == '__main__':
-    main('../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
-         '../data/Geolife Trajectories 1.3/middleware/trip_distribution.txt', 1012, 4.5 / 9)
+    main()

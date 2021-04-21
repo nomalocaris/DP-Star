@@ -13,21 +13,13 @@ import random
 
 import numpy as np
 
+from config import *
 from utils import ProgressBar
 
 
-def syn(aa_path='../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
-        omega_path='../data/Geolife Trajectories 1.3/middleware/grid_block_gps_range.txt',
-        max_t_len=94,
-        r_path='../data/Geolife Trajectories 1.3/middleware/trip_distribution.txt',
-        x_path='../data/Geolife Trajectories 1.3/middleware/midpoint_movement.txt',
-        l_path='../data/Geolife Trajectories 1.3/middleware/length_traj.txt',
-        sd_path='../data/Geolife Trajectories 1.3/sd/sd.txt',
-        sd_final_path='../data/Geolife Trajectories 1.3/sd/sd_final.txt',
-        min_latitude=0,
-        min_longitude=0,
-        A=1012,
-        nSyn=14650):
+def syn(aa_path=opath_grid_traj, omega_path=omega_path, r_path=r_path, x_path=x_path,
+        l_path=l_path, sd_path=sd_path, sd_final_path=sd_final_path, max_t_len=94,
+        min_latitude=0, min_longitude=0, A=1012, nSyn=14650):
     """basic description
 
     detailed description
