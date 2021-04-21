@@ -265,10 +265,8 @@ def cal_split(x_range, y_range, n_split):
     return split_lines
 
 
-def generate_sd_grid_mapping_traj(
-    ipath_sd, n_top_grid, ipath_top_grid, ipath_grid_block_gps_range, odir_sd,
-    mapping_rate=1, mapping_bais=None
-):
+def generate_sd_grid_mapping_traj(ipath_sd, n_top_grid, ipath_top_grid, ipath_grid_block_gps_range,
+                                  odir_sd, mapping_rate=1, mapping_bais=None):
     """generate the gird-mapping traj for SD
     """
     # for pep8

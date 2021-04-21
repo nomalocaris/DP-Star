@@ -67,7 +67,7 @@ def markov_model(trajectory, N, epsilon):
     return O_
 
 
-def main(A, epsilon, trip_file=opath_grid_traj, out_file=x_path):
+def mobility_model_main(A, epsilon, trip_file=opath_grid_traj, out_file=x_path):
     """
 
     主函数
@@ -96,7 +96,3 @@ def main(A, epsilon, trip_file=opath_grid_traj, out_file=x_path):
 
                 out_line += '\n'
                 fm.writelines(out_line)
-
-
-if __name__ == '__main__':
-    main()

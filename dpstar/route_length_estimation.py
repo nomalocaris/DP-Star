@@ -97,7 +97,7 @@ def route_length_estimate(trajectory, A, lo, hi, epsilon, sensitivity):
     return L_array
 
 
-def main(A, epsilon, trip_file=opath_grid_traj, out_file=l_path):
+def route_length_estimate_main(A, epsilon, trip_file=opath_grid_traj, out_file=l_path):
     """
 
     主函数
@@ -134,10 +134,4 @@ def main(A, epsilon, trip_file=opath_grid_traj, out_file=l_path):
                     f_out.writelines(star)
                     star = ''
 
-    print(maxT)
-
     return maxT
-
-
-if __name__ == '__main__':
-    main()

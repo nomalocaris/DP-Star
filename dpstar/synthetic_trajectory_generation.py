@@ -17,9 +17,9 @@ from config import *
 from utils import ProgressBar
 
 
-def syn(aa_path=opath_grid_traj, omega_path=omega_path, r_path=r_path, x_path=x_path,
-        l_path=l_path, sd_path=sd_path, sd_final_path=sd_final_path, max_t_len=94,
-        min_latitude=0, min_longitude=0, A=1012, nSyn=14650):
+def syn(A, max_t_len, aa_path=opath_grid_traj, omega_path=omega_path, r_path=r_path, x_path=x_path,
+        l_path=l_path, sd_path=sd_path, sd_final_path=sd_final_path, min_latitude=0,
+        min_longitude=0, nSyn=14650):
     """basic description
 
     detailed description
@@ -178,7 +178,3 @@ def syn(aa_path=opath_grid_traj, omega_path=omega_path, r_path=r_path, x_path=x_
     for sd in SD_final:
         sd_final_file.writelines(str(sd) + '\n')
     sd_final_file.close()
-
-
-if __name__ == '__main__':
-    syn()

@@ -63,7 +63,7 @@ def trip_distribution(trajectory, N, epsilon):
     return R
 
 
-def main(A, epsilon, trip_file=opath_grid_traj, out_file=r_path):
+def trip_distribution_main(A, epsilon, trip_file=opath_grid_traj, out_file=r_path):
     """
 
     主函数
@@ -83,7 +83,6 @@ def main(A, epsilon, trip_file=opath_grid_traj, out_file=r_path):
             T = []
             line = line.strip()[1:-1]
             line_array = line.split(',')
-            print(line_array)
             for step in line_array:
                 if len(step.strip()):
                     T.append(int(step.strip()))
@@ -98,7 +97,3 @@ def main(A, epsilon, trip_file=opath_grid_traj, out_file=r_path):
                     count += item2
                 line_str += '\n'
                 f_trip.writelines(line_str)
-
-
-if __name__ == '__main__':
-    main()
