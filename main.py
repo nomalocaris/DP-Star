@@ -3,7 +3,13 @@
 # Author: nomalocaris <nomalocaris.top>
 """"""
 from __future__ import (absolute_import, unicode_literals)
-from dpstar import generate_adaptive_grid, read_mdl_data, cal_split, generate_sd_grid_mapping_traj
+from dpstar import generate_adaptive_grid
+from dpstar import generate_sd_grid_mapping_traj
+from dpstar import trip_distribution_extraction
+from dpstar import mobility_model_construction
+from dpstar import route_length_estimation
+from dpstar import synthetic_trajectory_generation
+
 from config import *
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,17 +29,40 @@ n_grid = generate_adaptive_grid(
     # is_plot=True
 )
 
-# # generate sd traj
-# generate_sd_grid_mapping_traj(
-#     ipath_sd=opath_sd_grid,
-#     n_top_grid=n_top_grid,
-#     ipath_top_grid=opath_top_grid,
-#     ipath_grid_block_gps_range=opath_grid_block_gps_range,
-#     odir_sd=opath_sd,
-#     mapping_rate=300,
-#     mapping_bais={'lat': 39.6, 'lon': 115.8}
-#
-# )
+# generate sd traj
+generate_sd_grid_mapping_traj(
+    ipath_sd=opath_sd_grid,
+    n_top_grid=n_top_grid,
+    ipath_top_grid=opath_top_grid,
+    ipath_grid_block_gps_range=opath_grid_block_gps_range,
+    odir_sd=opath_sd,
+    mapping_rate=300,
+    mapping_bais={'lat': 39.6, 'lon': 115.8}
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #

@@ -101,4 +101,4 @@ def main(trip_file, out_file, a, epsilon):
 
 if __name__ == '__main__':
     main('../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
-         'data/Geolife Trajectories 1.3/middleware/trip_distribution_Giyn.txt', 1012, 4.5 / 9)
+         '../data/Geolife Trajectories 1.3/middleware/trip_distribution.txt', 1012, 4.5 / 9)
