@@ -301,7 +301,3 @@ def generate_sd_grid_mapping_traj(
                 point = [point[0]/mapping_rate+mapping_bais['lat'], point[1]/mapping_rate+mapping_bais['lon']]
                 fw_traj.write(str(point[0])+','+str(point[1])+'\n')
             fcount += 1
-
-
-
-
