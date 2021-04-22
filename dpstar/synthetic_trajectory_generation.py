@@ -10,16 +10,13 @@
 """
 
 import random
-
 import numpy as np
-
 from config import *
 from utils import ProgressBar
 
 
-def syn(A, max_t_len, aa_path=opath_grid_traj, omega_path=omega_path, r_path=r_path, x_path=x_path,
-        l_path=l_path, sd_path=sd_path, sd_final_path=sd_final_path, min_latitude=0,
-        min_longitude=0, nSyn=14650):
+def syn(A, max_t_len, aa_path=opath_grid_traj, r_path=r_path, x_path=x_path,
+        l_path=l_path, sd_path=sd_path, sd_final_path=sd_final_path, nSyn=14650):
     """basic description
 
     detailed description
@@ -34,10 +31,6 @@ def syn(A, max_t_len, aa_path=opath_grid_traj, omega_path=omega_path, r_path=r_p
         AA = list()
         for line in f.readlines():
             AA += eval(line)
-    with open(omega_path) as f:
-        M_omega = list()
-        for line in f.readlines():
-            M_omega += eval(line)
 
     # 读trip分布矩阵
     r_file = open(r_path, 'r')
@@ -80,12 +73,11 @@ def syn(A, max_t_len, aa_path=opath_grid_traj, omega_path=omega_path, r_path=r_p
             L.append(float(ele))
 
     sd_file = open(sd_path, 'w')
-    sd_final_file = open(sd_final_path, 'w')
 
     # 开始综合
     # line 1: Initialize SD as empty set
     SD = []
-    p1 = ProgressBar(nSyn, '生成脱敏数据')
+    p1 = ProgressBar(nSyn, '生成网格化的脱敏数据')
     for i in range(nSyn):
         p1.update(i)
         # Pick a sample S = (Cstart, Cend) from Rˆ
@@ -132,49 +124,3 @@ def syn(A, max_t_len, aa_path=opath_grid_traj, omega_path=omega_path, r_path=r_p
     for sd in SD:
         sd_file.writelines(str(sd) + '\n')
     sd_file.close()
-
-    # 转化成原数据坐标
-    SD_final = []
-    p2 = ProgressBar(nSyn, '脱敏数据坐标转换并写入文件')
-    for i in range(nSyn):
-        p2.update(i)
-        T = SD[i]
-        T_final = []
-        for j in range(len(T)):
-            # 确定M与A位置
-            C_index = T[j]
-            a_count = 0
-            for k in range(A):
-                A_a = AA[k]
-                a_count += A_a * A_a
-                if a_count > C_index:
-                    # M位置
-                    m_index = k
-                    m_start = M_omega[m_index][0]  # 大格子范围坐标
-                    m_end = M_omega[m_index][1]
-
-                    row_base = (m_end[0] - m_start[0]) / A_a
-                    col_base = (m_end[1] - m_start[1]) / A_a
-
-                    rela_A = C_index - (a_count - A_a * A_a)  # 相对位置
-                    row = int(rela_A / A_a)
-                    col = rela_A - row * A_a
-
-                    start_point = (row * row_base, col * col_base)
-                    end_point = ((row + 1) * row_base, (col + 1) * col_base)
-
-                    # 随机取样
-                    res_row = random.uniform(start_point[0], end_point[0])
-                    res_col = random.uniform(start_point[1], end_point[1])
-
-                    out_point = (
-                        (res_row + m_start[0]) / 300 + min_latitude,
-                        (res_col + m_start[1]) / 300 + min_longitude)
-                    T_final.append(out_point)
-                    break
-        SD_final.append(T_final)
-
-    # 写入文件
-    for sd in SD_final:
-        sd_final_file.writelines(str(sd) + '\n')
-    sd_final_file.close()
