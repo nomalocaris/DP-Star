@@ -30,16 +30,10 @@ beta_factor = 80
 idir_mdl_traj = 'data/Geolife Trajectories 1.3/representative_point'  # the mdl traj file
 opath_top_grid = 'data/Geolife Trajectories 1.3/middleware/top_grid.txt'  # the ada grid construction
 opath_grid_traj = 'data/Geolife Trajectories 1.3/middleware/grid_traj.txt'  # the grid-lized traj
-omega_path = 'data/Geolife Trajectories 1.3/middleware/grid_block_gps_range.txt'
+omega_path = 'data/Geolife Trajectories 1.3/middleware/grid_block_gps_range.txt'  # the top grid range
 r_path = 'data/Geolife Trajectories 1.3/middleware/trip_distribution.txt'
 x_path = 'data/Geolife Trajectories 1.3/middleware/midpoint_movement.txt'
 l_path = 'data/Geolife Trajectories 1.3/middleware/length_traj.txt'
-sd_path = 'data/Geolife Trajectories 1.3/sd/sd.txt'
-sd_final_path = 'data/Geolife Trajectories 1.3/sd/sd_final.txt'
+sd_path = 'data/Geolife Trajectories 1.3/middleware/sd.txt'  # grid-lized sd traj
+sd_final_path = 'data/Geolife Trajectories 1.3/sd/sd_final/'  # ture sd traj dir
 
-# the top grid range
-opath_grid_block_gps_range = 'data/Geolife Trajectories 1.3/middleware/grid_block_gps_range.txt'
-
-# the sd traj path
-opath_sd_grid = 'data/Geolife Trajectories 1.3/middleware/sd.txt'
-opath_sd = 'data/Geolife Trajectories 1.3/sd'
