@@ -294,6 +294,7 @@ def generate_sd_grid_mapping_traj(ipath_sd, n_top_grid, ipath_top_grid, ipath_gr
     p = utils.ProgressBar(len(reverse_mapped_trajs), '生成脱敏数据集')
     for i in range(len(reverse_mapped_trajs)):
         p.update(i)
+
         with open(odir_sd + '/sd_traj' + str(fcount) + '.txt', 'w') as fw_traj:
             for point in reverse_mapped_trajs[i]:
                 # mapping

@@ -5,6 +5,7 @@
 the config of parm for DP-Star
 """
 from __future__ import (absolute_import, unicode_literals)
+import os
 
 # privacy budget
 epsilon = 0.1
@@ -35,5 +36,8 @@ r_path = 'data/Geolife Trajectories 1.3/middleware/trip_distribution.txt'
 x_path = 'data/Geolife Trajectories 1.3/middleware/midpoint_movement.txt'
 l_path = 'data/Geolife Trajectories 1.3/middleware/length_traj.txt'
 sd_path = 'data/Geolife Trajectories 1.3/middleware/sd.txt'  # grid-lized sd traj
-sd_final_path = 'data/Geolife Trajectories 1.3/sd/sd_final/'  # ture sd traj dir
+sd_final_path = 'data/Geolife Trajectories 1.3/sd/sd_final_ep' + str(epsilon)  # ture sd traj dir
 
+# create sd final path
+if not os.path.exists(sd_final_path):
+    os.makedirs(sd_final_path)
