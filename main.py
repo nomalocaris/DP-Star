@@ -19,7 +19,7 @@ n_grid = generate_adaptive_grid(
     idir_traj=idir_mdl_traj,
     opath_top_grid=opath_top_grid,
     opath_grid_traj=opath_grid_traj,
-    opath_grid_block_gps_range=opath_grid_block_gps_range,
+    opath_grid_block_gps_range=omega_path,
     n_top_grid=n_top_grid,
     epsilon_alloc=epsilon_alloc['ag'],
     epsilon_tot=epsilon,
@@ -37,16 +37,16 @@ maxT = route_length_estimate_main(n_grid, epsilon=epsilon_alloc['mle'])
 
 syn(n_grid, maxT)
 
-# # generate sd traj
-# generate_sd_grid_mapping_traj(
-#     ipath_sd=opath_sd_grid,
-#     n_top_grid=n_top_grid,
-#     ipath_top_grid=opath_top_grid,
-#     ipath_grid_block_gps_range=opath_grid_block_gps_range,
-#     odir_sd=opath_sd,
-#     mapping_rate=300,
-#     mapping_bais={'lat': 39.6, 'lon': 115.8}
-# )
+# generate sd traj
+generate_sd_grid_mapping_traj(
+    ipath_sd=sd_path,
+    n_top_grid=n_top_grid,
+    ipath_top_grid=opath_top_grid,
+    ipath_grid_block_gps_range=omega_path,
+    odir_sd=sd_final_path,
+    mapping_rate=300,
+    mapping_bais={'lat': 39.6, 'lon': 115.8}
+)
 
 #
 # tot_traj = read_mdl_data(idir_mdl_traj)
