@@ -276,7 +276,6 @@ def generate_sd_grid_mapping_traj(ipath_sd, n_top_grid, ipath_top_grid, ipath_gr
     # privacy budget
     with open(ipath_sd) as fr_sd:
         sd = [eval(point.replace('\n', '')) for point in fr_sd.readlines()]
-    print(len(sd))
     # C = n_top_grid ** 2
     # with open(ipath_top_grid) as fr_top_grid:
     #     M = eval(fr_top_grid.readline())
@@ -288,14 +287,15 @@ def generate_sd_grid_mapping_traj(ipath_sd, n_top_grid, ipath_top_grid, ipath_gr
 
     reverse_mapped_trajs = []
     for traj in sd:
-        print(traj)
         reverse_mapped_trajs.append([list(np.mean(grid_block_gps_range[i], axis=0)) for i in traj])
 
     # write to files
     fcount = 0
-    for traj in reverse_mapped_trajs:
+    p = utils.ProgressBar(len(reverse_mapped_trajs), '生成脱敏数据集')
+    for i in range(len(reverse_mapped_trajs)):
+        p.update(i)
         with open(odir_sd + '/sd_traj' + str(fcount) + '.txt', 'w') as fw_traj:
-            for point in traj:
+            for point in reverse_mapped_trajs[i]:
                 # mapping
                 point = [point[0]/mapping_rate+mapping_bais['lat'], point[1]/mapping_rate+mapping_bais['lon']]
                 fw_traj.write(str(point[0])+','+str(point[1])+'\n')
