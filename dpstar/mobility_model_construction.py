@@ -14,6 +14,7 @@ import random
 
 import numpy as np
 
+from config import *
 from utils import signum, ProgressBar
 
 
@@ -66,7 +67,7 @@ def markov_model(trajectory, N, epsilon):
     return O_
 
 
-def main(trip_file, out_file, A, epsilon):
+def mobility_model_main(A, epsilon, trip_file=opath_grid_traj, out_file=x_path):
     """
 
     主函数
@@ -95,8 +96,3 @@ def main(trip_file, out_file, A, epsilon):
 
                 out_line += '\n'
                 fm.writelines(out_line)
-
-
-if __name__ == '__main__':
-    main('../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
-         'data/Geolife Trajectories 1.3/middleware/midpoint_movement_Giyn.txt', 1012, 4.5 / 9)

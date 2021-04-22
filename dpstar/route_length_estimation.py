@@ -13,6 +13,7 @@ import random
 
 import numpy as np
 
+from config import *
 from utils import ProgressBar
 
 
@@ -96,7 +97,7 @@ def route_length_estimate(trajectory, A, lo, hi, epsilon, sensitivity):
     return L_array
 
 
-def main(trip_file, out_file, A, epsilon):
+def route_length_estimate_main(A, epsilon, trip_file=opath_grid_traj, out_file=l_path):
     """
 
     主函数
@@ -133,11 +134,4 @@ def main(trip_file, out_file, A, epsilon):
                     f_out.writelines(star)
                     star = ''
 
-    print(maxT)
-
     return maxT
-
-
-if __name__ == '__main__':
-    main('../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
-         'data/Geolife Trajectories 1.3/middleware/length_traj_Giyn.txt', 1012, 3 / 9)
