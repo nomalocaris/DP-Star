@@ -39,25 +39,30 @@ def trip_distribution(trajectory, N, epsilon):
             sta = t[0]
             end = t[-1]
             R[sta][end] += 1
+        else:
+            print(t)
 
-    count = 0
+    count = np.sum(R)
+    print(count)
 
     p = ProgressBar(N, '建立转移概率矩阵')
     for i in range(N):
         p.update(i)
         for j in range(N):
             # 添加拉普拉斯噪声
-            sensitivity = 1
-            randomDouble = random.random() - 0.5
-            noise = - (sensitivity / epsilon) * signum(randomDouble) * math.log(
-                1 - 2 * abs(randomDouble))
+            # sensitivity = 1
+            # randomDouble = random.random() - 0.5
+            # noise = - (sensitivity / epsilon) * signum(randomDouble) * math.log(
+            #     1 - 2 * abs(randomDouble))
+            noise = np.random.laplace(0, 1 / epsilon)
 
             R[i][j] += noise
 
             if R[i][j] < 0:
                 R[i][j] = 0
 
-            count += R[i][j]
+            # 是否计算加完噪声后的|D|, 存疑
+            # count += R[i][j]
     R /= count
 
     return R
@@ -90,10 +95,17 @@ def trip_distribution_main(A, epsilon, trip_file=opath_grid_traj, out_file=r_pat
 
         with open(out_file, 'w') as f_trip:
             count = 0
-            for item in trip_distribution(T_all, A, epsilon):
+            trip_distribution_mat = trip_distribution(T_all, A, epsilon)
+            for item in trip_distribution_mat:
                 line_str = ''
                 for item2 in item:
                     line_str += str(item2) + ' '
                     count += item2
                 line_str += '\n'
                 f_trip.writelines(line_str)
+
+
+if __name__ == '__main__':
+    trip_distribution_main(67, 0.1 * 1 / 9,
+                           '../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
+                           '../data/Geolife Trajectories 1.3/middleware/trip_distribution.txt')
