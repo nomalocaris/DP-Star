@@ -48,11 +48,13 @@ def markov_model(trajectory, N, epsilon):
         p.update(i)
         score = 0
         for j in range(N):
-            # 添加噪声
-            sensitivity = 1
-            randomDouble = random.random() - 0.5
-            noise = - (sensitivity / epsilon) * signum(randomDouble) * math.log(
-                1 - 2 * abs(randomDouble))
+            # 添加拉普拉斯噪声
+            # sensitivity = 1
+            # randomDouble = random.random() - 0.5
+            # noise = - (sensitivity / epsilon) * signum(randomDouble) * math.log(
+            #     1 - 2 * abs(randomDouble))
+
+            noise = np.random.laplace(0, 1 / epsilon)
 
             O_[i][j] += noise
             if O_[i][j] < 0:
