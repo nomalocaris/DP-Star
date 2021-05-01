@@ -4,6 +4,7 @@
 """"""
 from __future__ import (absolute_import, unicode_literals)
 from ._progressbar import ProgressBar
+from ._plot import plot_scatter, plot_traj
 
 
 def signum(x):
