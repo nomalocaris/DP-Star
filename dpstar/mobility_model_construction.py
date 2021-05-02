@@ -9,14 +9,12 @@
 -------------------------------------
 """
 
-import math
-import random
-import seaborn as sns
+import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 from config import *
-from utils import signum, ProgressBar
-import matplotlib.pyplot as plt
+from utils import ProgressBar
 
 
 def markov_model(trajectory, N, epsilon):
@@ -56,7 +54,7 @@ def markov_model(trajectory, N, epsilon):
             #     1 - 2 * abs(randomDouble))
 
             noise = np.random.laplace(0, 1 / epsilon)
-
+            # noise = 0.00000000000000000000000001
             O_[i][j] += noise
             if O_[i][j] < 0:
                 O_[i][j] = 0
@@ -66,6 +64,7 @@ def markov_model(trajectory, N, epsilon):
     # compute X，归一
     for i in range(N):
         O_[i] /= line_all[i]
+
     sns.heatmap(data=O_, square=True)
     plt.show()
 
@@ -104,6 +103,6 @@ def mobility_model_main(A, epsilon, trip_file=opath_grid_traj, out_file=x_path):
 
 
 if __name__ == '__main__':
-    mobility_model_main(67, 0.1 * 3/9,
+    mobility_model_main(364, 2 * 3/9,
                         '../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
                         '../data/Geolife Trajectories 1.3/middleware/midpoint_movement.txt')

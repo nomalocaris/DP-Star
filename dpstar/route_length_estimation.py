@@ -11,7 +11,9 @@
 
 import random
 
+import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 from config import *
 from utils import ProgressBar
@@ -107,6 +109,7 @@ def route_length_estimate_main(A, epsilon, trip_file=opath_grid_traj, out_file=l
     Returns:
 
     """
+    length_list = []
     with open(trip_file, 'r') as file_object:
         with open(out_file, 'w') as f_out:
             T_all = []
@@ -123,15 +126,28 @@ def route_length_estimate_main(A, epsilon, trip_file=opath_grid_traj, out_file=l
                 T_all.append(T)
             count = 0
             star = ''
+            length_sub_list = []
             for i in route_length_estimate(T_all, A, 0, 1.25 * maxT, epsilon, 1):
                 if i < 2:
                     i = 2
                 star += str(i) + ' '
                 count += 1
-
+                length_sub_list.append(i)
                 if count % A == 0:
+                    length_list.append(length_sub_list)
+                    length_sub_list = []
                     star += '\n'
                     f_out.writelines(star)
                     star = ''
+    length_matrix = np.array(length_list)
+    print(length_matrix)
+    sns.heatmap(data=length_matrix, square=True)
+    plt.show()
 
     return maxT
+
+
+if __name__ == '__main__':
+    route_length_estimate_main(364, 2 * 2/9,
+                               '../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
+                               '../data/Geolife Trajectories 1.3/middleware/length_traj.txt')
