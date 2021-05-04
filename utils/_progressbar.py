@@ -57,7 +57,7 @@ class ProgressBar(object):
         # cal the progress bar
         new_progress = int(pace / self._tot_pace * 100)
         self._current_progress = new_progress + 1
-        self._state_mid = '#' * (self._current_progress // 5)
+        self._state_mid = '#' * (self._current_progress // 5) + '·' * (20 - (self._current_progress // 5))
         # cal pass time
         tpass = (self._time_pair['n'] - self._time_base)
         # cal remain time
