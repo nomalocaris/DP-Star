@@ -269,6 +269,13 @@ def generate_sd_grid_mapping_traj(ipath_sd, n_top_grid, ipath_top_grid, ipath_gr
                                   odir_sd, mapping_rate=1, mapping_bais=None):
     """generate the gird-mapping traj for SD
     """
+    def random_sampling(grid_range):
+        """generate a sample point within a grid range
+        """
+        x = np.random.uniform(grid_range[0][0], grid_range[1][0])
+        y = np.random.uniform(grid_range[0][1], grid_range[1][1])
+        return x, y
+
     # for pep8
     if mapping_bais is None:
         mapping_bais = {'lat': 0, 'lon': 0}
@@ -287,7 +294,7 @@ def generate_sd_grid_mapping_traj(ipath_sd, n_top_grid, ipath_top_grid, ipath_gr
 
     reverse_mapped_trajs = []
     for traj in sd:
-        reverse_mapped_trajs.append([list(np.mean(grid_block_gps_range[i], axis=0)) for i in traj])
+        reverse_mapped_trajs.append([random_sampling(grid_block_gps_range[i]) for i in traj])
 
     # write to files
     fcount = 0
