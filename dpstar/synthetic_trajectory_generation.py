@@ -78,10 +78,15 @@ def syn(A, max_t_len, aa_path=opath_grid_traj, r_path=r_path, x_path=x_path,
     # line 1: Initialize SD as empty set
     SD = []
     p1 = ProgressBar(nSyn, '生成网格化的脱敏数据')
+
+    # test
+    l_arr = []
+    l_exp_arr = []
+
     for i in range(nSyn):
-        p1.update(i)
+        # p1.update(i)
         # Pick a sample S = (Cstart, Cend) from Rˆ
-        index_array = [int(j) for j in range(A * A)]
+        index_array = [j for j in range(A * A)]
         R = np.array(R)
         R = R / np.sum(R)
         # 选trip 分布
@@ -91,10 +96,15 @@ def syn(A, max_t_len, aa_path=opath_grid_traj, r_path=r_path, x_path=x_path,
         end_point = index - start_point * A  # 轨迹终点
 
         l_now = L[index]  # 轨迹长度参数
+
         r_length = random.expovariate(np.log(2) / l_now)  # 指数分布取轨迹长
         r_length = int(np.round(r_length))  # 整数化
         if r_length < 2:
             r_length = 2
+
+        l_arr.append(l_now)
+        l_exp_arr.append(r_length)
+
         T = []
         prev_point = start_point
         T.append(prev_point)  # 加入起始点
@@ -121,6 +131,18 @@ def syn(A, max_t_len, aa_path=opath_grid_traj, r_path=r_path, x_path=x_path,
         T.append(end_point)  # 加入结束点
         SD.append(T)  # 加入轨迹
 
+    print(np.sum(l_arr), '均值', np.mean(l_arr))
+    print(np.sum(l_exp_arr), '均值', np.mean(l_exp_arr))
+
     for sd in SD:
         sd_file.writelines(str(sd) + '\n')
     sd_file.close()
+
+
+if __name__ == '__main__':
+    syn(67, 1683, aa_path='../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
+        r_path='../data/Geolife Trajectories 1.3/middleware/trip_distribution.txt',
+        x_path='../data/Geolife Trajectories 1.3/middleware/midpoint_movement.txt',
+        l_path='../data/Geolife Trajectories 1.3/middleware/length_traj.txt',
+        sd_path='../data/Geolife Trajectories 1.3/middleware/sd.txt',
+        sd_final_path='../data/Geolife Trajectories 1.3/sd/sd_final_ep' + str(epsilon), nSyn=14650)
