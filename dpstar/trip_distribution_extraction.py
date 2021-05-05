@@ -11,7 +11,8 @@
 
 import math
 import random
-
+import seaborn as sns
+import matplotlib.pyplot as plt
 import numpy as np
 
 from config import *
@@ -65,6 +66,9 @@ def trip_distribution(trajectory, N, epsilon):
             # count += R[i][j]
     R /= count
 
+    sns.heatmap(data=R, square=True)
+    plt.show()
+
     return R
 
 
@@ -106,6 +110,6 @@ def trip_distribution_main(A, epsilon, trip_file=opath_grid_traj, out_file=r_pat
 
 
 if __name__ == '__main__':
-    trip_distribution_main(67, 0.1 * 1 / 9,
+    trip_distribution_main(67, 2 * 1 / 9,
                            '../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
                            '../data/Geolife Trajectories 1.3/middleware/trip_distribution.txt')
