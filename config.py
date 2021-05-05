@@ -19,7 +19,7 @@ epsilon_alloc = {
 }
 
 # trajectory geo range
-gps_range = {'lon': (0, 359.9955), 'lat': (0, 479.99499)}
+gps_range = {'lat': (0, 1320), 'lon': (0, 1760)}
 
 # the number of the top grid
 n_top_grid = 7
@@ -38,6 +38,8 @@ l_path = 'data/Geolife Trajectories 1.3/middleware/length_traj.txt'
 sd_path = 'data/Geolife Trajectories 1.3/middleware/sd.txt'  # grid-lized sd traj
 sd_final_path = 'data/Geolife Trajectories 1.3/sd/sd_final_ep' + str(epsilon)  # ture sd traj dir
 
-# create sd final path
-if not os.path.exists(sd_final_path):
-    os.makedirs(sd_final_path)
+
+def make_dir():
+    # create sd final path
+    if not os.path.exists(sd_final_path):
+        os.makedirs(sd_final_path)
