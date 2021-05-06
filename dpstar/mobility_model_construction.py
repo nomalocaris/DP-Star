@@ -103,6 +103,6 @@ def mobility_model_main(A, epsilon, trip_file=opath_grid_traj, out_file=x_path):
 
 
 if __name__ == '__main__':
-    mobility_model_main(364, 2 * 3/9,
-                        '../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
-                        '../data/Geolife Trajectories 1.3/middleware/midpoint_movement.txt')
+    mobility_model_main(67, 2 * 3/9,
+                        '../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep' + str(epsilon) + '.txt',
+                        '../data/Geolife Trajectories 1.3/middleware/midpoint_movement_MDL1100_ep' + str(epsilon) + '.txt')

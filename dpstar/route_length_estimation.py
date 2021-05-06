@@ -162,5 +162,5 @@ if __name__ == '__main__':
     for e in [0.1, 0.5, 1.0, 2.0]:
         print('-'*5, e)
         route_length_estimate_main(67, e * 2 / 9,
-                                   '../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
-                                   '../data/Geolife Trajectories 1.3/middleware/length_traj.txt')
+                                   '../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep' + str(epsilon) + '.txt',
+                                   '../data/Geolife Trajectories 1.3/middleware/length_traj_MDL1100_ep' + str(epsilon) + '.txt')

@@ -111,5 +111,5 @@ def trip_distribution_main(A, epsilon, trip_file=opath_grid_traj, out_file=r_pat
 
 if __name__ == '__main__':
     trip_distribution_main(67, 2 * 1 / 9,
-                           '../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
-                           '../data/Geolife Trajectories 1.3/middleware/trip_distribution.txt')
+                           '../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep' + str(epsilon) + '.txt',
+                           '../data/Geolife Trajectories 1.3/middleware/trip_distribution_MDL1100_ep' + str(epsilon) + '.txt')
