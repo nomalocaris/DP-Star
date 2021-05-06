@@ -88,7 +88,7 @@ def syn(A, max_t_len, aa_path=opath_grid_traj, r_path=r_path, x_path=x_path,
         # Pick a sample S = (Cstart, Cend) from Rˆ
         index_array = [j for j in range(A * A)]
         R = np.array(R)
-        R = R / np.sum(R)
+        R /= np.sum(R)
         # 选trip 分布
         index = np.random.choice(index_array, p=R.ravel())
 
@@ -123,7 +123,7 @@ def syn(A, max_t_len, aa_path=opath_grid_traj, r_path=r_path, x_path=x_path,
             sample_prob = np.array(sample_prob)
             if np.sum(sample_prob) == 0:
                 continue
-            sample_prob = sample_prob / np.sum(sample_prob)  # 归一化
+            sample_prob /= np.sum(sample_prob)  # 归一化
             now_point = np.random.choice([int(m) for m in range(A)], p=sample_prob.ravel())  # 抽样
             prev_point = now_point  # 更新上一个点
             T.append(now_point)  # 加入轨迹中
