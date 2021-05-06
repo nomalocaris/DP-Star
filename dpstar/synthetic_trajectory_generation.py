@@ -146,4 +146,5 @@ if __name__ == '__main__':
         x_path='../data/Geolife Trajectories 1.3/middleware/midpoint_movement_MDL1100_ep' + str(epsilon) + '.txt',
         l_path='../data/Geolife Trajectories 1.3/middleware/length_traj_MDL1100_ep' + str(epsilon) + '.txt',
         sd_path='../data/Geolife Trajectories 1.3/middleware/sd_MDL1100_ep' + str(epsilon) + '.txt',
-        sd_final_path='../data/Geolife Trajectories 1.3/sd/sd_final_ep' + str(epsilon), nSyn=14650)
+        sd_final_path='../data/Geolife Trajectories 1.3/sd/sd_final_ep' + str(epsilon),
+        nSyn=14650)
