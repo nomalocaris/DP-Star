@@ -140,9 +140,10 @@ def syn(A, max_t_len, aa_path=opath_grid_traj, r_path=r_path, x_path=x_path,
 
 
 if __name__ == '__main__':
-    syn(67, 1683, aa_path='../data/Geolife Trajectories 1.3/middleware/grid_traj.txt',
-        r_path='../data/Geolife Trajectories 1.3/middleware/trip_distribution.txt',
-        x_path='../data/Geolife Trajectories 1.3/middleware/midpoint_movement.txt',
-        l_path='../data/Geolife Trajectories 1.3/middleware/length_traj.txt',
-        sd_path='../data/Geolife Trajectories 1.3/middleware/sd.txt',
+    syn(67, 1683,
+        aa_path='../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep' + str(epsilon) + '.txt',
+        r_path='../data/Geolife Trajectories 1.3/middleware/trip_distribution_MDL1100_ep' + str(epsilon) + '.txt',
+        x_path='../data/Geolife Trajectories 1.3/middleware/midpoint_movement_MDL1100_ep' + str(epsilon) + '.txt',
+        l_path='../data/Geolife Trajectories 1.3/middleware/length_traj_MDL1100_ep' + str(epsilon) + '.txt',
+        sd_path='../data/Geolife Trajectories 1.3/middleware/sd_MDL1100_ep' + str(epsilon) + '.txt',
         sd_final_path='../data/Geolife Trajectories 1.3/sd/sd_final_ep' + str(epsilon), nSyn=14650)
