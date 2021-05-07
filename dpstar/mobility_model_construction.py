@@ -66,6 +66,7 @@ def markov_model(trajectory, N, epsilon):
         O_[i] /= line_all[i]
 
     sns.heatmap(data=O_, square=True)
+    plt.title('mobility model construction matrix')
     plt.show()
 
     return O_
@@ -103,6 +104,8 @@ def mobility_model_main(A, epsilon, trip_file=opath_grid_traj, out_file=x_path):
 
 
 if __name__ == '__main__':
-    mobility_model_main(67, 2 * 3/9,
-                        '../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep' + str(epsilon) + '.txt',
-                        '../data/Geolife Trajectories 1.3/middleware/midpoint_movement_MDL1100_ep' + str(epsilon) + '.txt')
+    ep_grid_pairs = ((0.1, 67), (2.0, 364))
+    used_pair = ep_grid_pairs[0]
+    mobility_model_main(used_pair[1], used_pair[0] * 1 / 9,
+                        f'../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep{used_pair[0]}.txt',
+                        f'../data/Geolife Trajectories 1.3/middleware/midpoint_movement_MDL1100_ep{used_pair[0]}.txt')
