@@ -9,15 +9,12 @@
 -------------------------------------
 """
 
-import math
-import random
-import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 from config import *
 from utils import ProgressBar
-from utils import signum
 
 
 def trip_distribution(trajectory, N, epsilon):
@@ -40,33 +37,24 @@ def trip_distribution(trajectory, N, epsilon):
             sta = t[0]
             end = t[-1]
             R[sta][end] += 1
-        else:
-            print(t)
 
-    count = np.sum(R)
-    print(count)
+    count = int(np.sum(R))  # 轨迹条数
 
     p = ProgressBar(N, '建立转移概率矩阵')
     for i in range(N):
         p.update(i)
         for j in range(N):
-            # 添加拉普拉斯噪声
-            # sensitivity = 1
-            # randomDouble = random.random() - 0.5
-            # noise = - (sensitivity / epsilon) * signum(randomDouble) * math.log(
-            #     1 - 2 * abs(randomDouble))
-            noise = np.random.laplace(0, 1 / epsilon)
-
+            noise = np.random.laplace(0, 1 / epsilon)  # 添加拉普拉斯噪声
             R[i][j] += noise
 
             if R[i][j] < 0:
                 R[i][j] = 0
 
-            # 是否计算加完噪声后的|D|, 存疑
-            # count += R[i][j]
     R /= count
 
+    # 绘制转移概率矩阵热力图
     sns.heatmap(data=R, square=True)
+    plt.title('trip distribution (epsilon=%s)' % str(used_pair[0]))
     plt.show()
 
     return R
@@ -110,6 +98,8 @@ def trip_distribution_main(A, epsilon, trip_file=opath_grid_traj, out_file=r_pat
 
 
 if __name__ == '__main__':
-    trip_distribution_main(67, 2 * 1 / 9,
-                           '../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep' + str(epsilon) + '.txt',
-                           '../data/Geolife Trajectories 1.3/middleware/trip_distribution_MDL1100_ep' + str(epsilon) + '.txt')
+    ep_grid_pairs = ((0.1, 67), (2.0, 364))
+    used_pair = ep_grid_pairs[0]
+    trip_distribution_main(used_pair[1], used_pair[0] * 1 / 9,
+                           '../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep' + str(used_pair[0]) + '.txt',
+                           '../data/Geolife Trajectories 1.3/middleware/trip_distribution_MDL1100_ep' + str(used_pair[0]) + '.txt')
