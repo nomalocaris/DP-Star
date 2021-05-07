@@ -66,7 +66,7 @@ def markov_model(trajectory, N, epsilon):
         O_[i] /= line_all[i]
 
     sns.heatmap(data=O_, square=True)
-    plt.title('mobility model construction matrix')
+    plt.title('mobility model construction matrix (epsilon=%s)' % str(used_pair[0]))
     plt.show()
 
     return O_
