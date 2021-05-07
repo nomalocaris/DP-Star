@@ -31,7 +31,7 @@ def trip_distribution(trajectory, N, epsilon):
         R: 转移概率矩阵
 
     """
-    R = np.zeros((N, N))  # 每个格子建立转移概率矩阵
+    R = np.zeros((N, N))  # 建立 N*N 的转移概率矩阵
     for t in trajectory:
         if len(t) > 1:
             sta = t[0]
