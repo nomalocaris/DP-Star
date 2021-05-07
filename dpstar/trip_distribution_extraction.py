@@ -20,7 +20,7 @@ from utils import ProgressBar
 def trip_distribution(trajectory, N, epsilon):
     """
 
-    获取行程分布
+    获取转移概率矩阵
 
     Args:
         trajectory: 轨迹数据(二维数组)
@@ -40,7 +40,7 @@ def trip_distribution(trajectory, N, epsilon):
 
     count = int(np.sum(R))  # 轨迹条数
 
-    p = ProgressBar(N, '建立转移概率矩阵')
+    p = ProgressBar(N, '生成转移概率矩阵')
     for i in range(N):
         p.update(i)
         for j in range(N):
@@ -63,7 +63,7 @@ def trip_distribution(trajectory, N, epsilon):
 def trip_distribution_main(A, epsilon, src_file=opath_grid_traj, out_file=r_path):
     """
 
-    主函数
+    主函数(将转移概率矩阵写入文件)
 
     Args:
         A       : 网格数
