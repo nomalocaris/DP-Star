@@ -60,46 +60,32 @@ def trip_distribution(trajectory, N, epsilon):
     return R
 
 
-def trip_distribution_main(A, epsilon, trip_file=opath_grid_traj, out_file=r_path):
+def trip_distribution_main(A, epsilon, src_file=opath_grid_traj, out_file=r_path):
     """
 
     主函数
 
     Args:
-        trip_file:
-        out_file:
-        a:
-        epsilon:
+        A       : 网格数
+        epsilon : 隐私预算
+        src_file: 网格轨迹文件路径
+        out_file: 转移概率矩阵输出文件路径
 
     Returns:
 
     """
-    with open(trip_file, 'r') as file_object:
-        T_all = []
-        for line in file_object.readlines():
-            T = []
-            line = line.strip()[1:-1]
-            line_array = line.split(',')
-            for step in line_array:
-                if len(step.strip()):
-                    T.append(int(step.strip()))
-            T_all.append(T)
-
-        with open(out_file, 'w') as f_trip:
-            count = 0
-            trip_distribution_mat = trip_distribution(T_all, A, epsilon)
-            for item in trip_distribution_mat:
-                line_str = ''
-                for item2 in item:
-                    line_str += str(item2) + ' '
-                    count += item2
-                line_str += '\n'
-                f_trip.writelines(line_str)
+    with open(src_file, 'r') as trajectory_file:
+        T = [eval(trajectory) for trajectory in trajectory_file.readlines()]  # 网格轨迹数据(list)
+        with open(out_file, 'w') as trip_distribution_file:
+            trip_distribution_matrix = trip_distribution(T, A, epsilon)
+            for item in trip_distribution_matrix:
+                each_line = ' '.join([str(i) for i in item]) + '\n'
+                trip_distribution_file.writelines(each_line)
 
 
 if __name__ == '__main__':
     ep_grid_pairs = ((0.1, 67), (2.0, 364))
     used_pair = ep_grid_pairs[0]
     trip_distribution_main(used_pair[1], used_pair[0] * 1 / 9,
-                           '../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep' + str(used_pair[0]) + '.txt',
-                           '../data/Geolife Trajectories 1.3/middleware/trip_distribution_MDL1100_ep' + str(used_pair[0]) + '.txt')
+                           f'../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep{used_pair[0]}.txt',
+                           f'../data/Geolife Trajectories 1.3/middleware/trip_distribution_MDL1100_ep{used_pair[0]}.txt')
