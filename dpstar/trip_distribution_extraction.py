@@ -32,11 +32,19 @@ def trip_distribution(trajectory, N, epsilon):
 
     """
     R = np.zeros((N, N))  # 建立 N*N 的转移概率矩阵
+    sta_list = []
+    end_list = []
     for t in trajectory:
         if len(t) > 1:
             sta = t[0]
             end = t[-1]
+            sta_list.append(sta)
+            end_list.append(end)
             R[sta][end] += 1
+
+    plt.scatter(sta_list, end_list, s=10)
+    plt.title('trip scatter (epsilon=%s)' % str(used_pair[0]))
+    plt.show()
 
     count = int(np.sum(R))  # 轨迹条数
 
