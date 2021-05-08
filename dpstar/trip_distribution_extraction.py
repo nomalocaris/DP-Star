@@ -32,11 +32,19 @@ def trip_distribution(trajectory, N, epsilon):
 
     """
     R = np.zeros((N, N))  # 建立 N*N 的转移概率矩阵
+    sta_list = []
+    end_list = []
     for t in trajectory:
         if len(t) > 1:
             sta = t[0]
             end = t[-1]
+            sta_list.append(sta)
+            end_list.append(end)
             R[sta][end] += 1
+
+    plt.scatter(sta_list, end_list, s=10)
+    plt.title('trip scatter (epsilon=%s)' % str(used_pair[0]))
+    plt.show()
 
     count = int(np.sum(R))  # 轨迹条数
 
@@ -84,7 +92,7 @@ def trip_distribution_main(A, epsilon, src_file=opath_grid_traj, out_file=r_path
 
 
 if __name__ == '__main__':
-    ep_grid_pairs = ((0.1, 67), (2.0, 364))
+    ep_grid_pairs = ((0.1, 67), (0.5, 120), (1.0, 193), (2.0, 364))
     used_pair = ep_grid_pairs[0]
     trip_distribution_main(used_pair[1], used_pair[0] * 1 / 9,
                            f'../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep{used_pair[0]}.txt',
