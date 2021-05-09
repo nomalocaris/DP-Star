@@ -25,9 +25,9 @@ def exp_mechanism(score, m, epsilon, sensitivity):
     指数机制，选出一个符合定义的下标
 
     Args:
-        score:
-        m:
-        epsilon:
+        score      :
+        m          :
+        epsilon    :
         sensitivity:
 
     Returns:
@@ -57,9 +57,9 @@ def exp_mechanism(score, m, epsilon, sensitivity):
 
 
 def route_length_estimate(trajectory, A, lo, hi, epsilon, sensitivity):
-    """basic description
+    """
 
-    detailed description
+    轨迹长度估计
 
     Args:
 
@@ -69,8 +69,7 @@ def route_length_estimate(trajectory, A, lo, hi, epsilon, sensitivity):
     C = A * A
     L_matrix = [[] for _ in range(C)]  # L矩阵
     L_array = []
-    L_mean = []
-    L_median = []
+
     for t in trajectory:
         lenT = len(t)
         if lenT > hi:
@@ -82,35 +81,27 @@ def route_length_estimate(trajectory, A, lo, hi, epsilon, sensitivity):
         col = t[-1]
         l_index = row * A + col  # 转一维坐标
         L_matrix[l_index].append(lenT)
-    p = ProgressBar(C, '计算轨迹中值长度矩阵')
 
+    p = ProgressBar(C, '计算轨迹中值长度矩阵')
     for i in range(C):
         # p.update(i)
         score_arr = []
         K = L_matrix[i].copy()  # 取一种头尾轨迹的所有轨迹长
         K.sort()  # 顺序排序
         if len(K) < 1:
-            L_mean.append(0)
-            L_median.append(0)
             L_array.append(0)
             continue
         m_index = len(K) / 2  # 中值下标
         for j in range(len(K)):
             score_arr.append(-abs(j - m_index))  # 得分函数
         r_index = exp_mechanism(score_arr, len(K), epsilon, sensitivity)
-        # print(K, '--->', K[r_index], np.mean(K))
-        L_mean.append(np.mean(K))
-        L_median.append(np.median(K))
+        # print(K, '--->', K[r_index])
         L_array.append(K[r_index])
-
-    print(sum(L_mean), '均值: ', np.mean(L_mean))
-    print(sum(L_median), '均值: ', np.mean(L_median))
-    print(sum(L_array), '均值: ', np.mean(L_array))
 
     return L_array
 
 
-def route_length_estimate_main(A, epsilon, trip_file=opath_grid_traj, out_file=l_path):
+def route_length_estimate_main(A, epsilon, src_file, out_file):
     """
 
     主函数
@@ -159,8 +150,8 @@ def route_length_estimate_main(A, epsilon, trip_file=opath_grid_traj, out_file=l
 
 
 if __name__ == '__main__':
-    for e in [0.1, 0.5, 1.0, 2.0]:
-        print('-'*5, e)
-        route_length_estimate_main(67, e * 2 / 9,
-                                   '../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep' + str(epsilon) + '.txt',
-                                   '../data/Geolife Trajectories 1.3/middleware/length_traj_MDL1100_ep' + str(epsilon) + '.txt')
+    ep_grid_pairs = ((0.1, 67), (0.5, 120), (1.0, 193), (2.0, 364))
+    used_pair = ep_grid_pairs[0]
+    route_length_estimate_main(used_pair[1], used_pair[0] * 2 / 9,
+                               f'../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep{used_pair[0]}.txt',
+                               f'../data/Geolife Trajectories 1.3/middleware/length_traj_MDL1100_ep{used_pair[0]}.txt')
