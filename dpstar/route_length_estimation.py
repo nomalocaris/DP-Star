@@ -15,7 +15,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from config import *
 from utils import ProgressBar
 
 
@@ -84,7 +83,7 @@ def route_length_estimate(trajectory, A, lo, hi, epsilon, sensitivity):
 
     p = ProgressBar(C, '计算轨迹中值长度矩阵')
     for i in range(C):
-        # p.update(i)
+        p.update(i)
         score_arr = []
         K = L_matrix[i].copy()  # 取一种头尾轨迹的所有轨迹长
         K.sort()  # 顺序排序
@@ -111,39 +110,23 @@ def route_length_estimate_main(A, epsilon, src_file, out_file):
     Returns:
 
     """
-    length_list = []
-    with open(trip_file, 'r') as file_object:
-        with open(out_file, 'w') as f_out:
-            T_all = []
-            maxT = 0
-            for line in file_object.readlines():
-                T = []
-                line = line.strip()[1:-1]
-                line_array = line.split(',')
-                for step in line_array:
-                    if len(step.strip()) > 0:
-                        T.append(int(step.strip()))
-                if len(T) > maxT:
-                    maxT = len(T)
-                T_all.append(T)
-            count = 0
-            star = ''
-            length_sub_list = []
-            for i in route_length_estimate(T_all, A, 0, 1.25 * maxT, epsilon, 1):
-                if i < 2:
-                    i = 2
-                star += str(i) + ' '
-                count += 1
-                length_sub_list.append(i)
-                if count % A == 0:
-                    length_list.append(length_sub_list)
-                    length_sub_list = []
-                    star += '\n'
-                    f_out.writelines(star)
-                    star = ''
-    length_matrix = np.array(length_list)
-    print(np.sum(length_matrix), '均值', np.mean(length_matrix))
-    sns.heatmap(data=length_matrix, square=True)
+    with open(src_file, 'r') as grid_trajectories_file:
+        # 网格轨迹数据(list)
+        T = [eval(grid_trajectory) for grid_trajectory in grid_trajectories_file.readlines()]
+        maxT = max([len(i) for i in T])
+        with open(out_file, 'w') as route_length_file:
+            l_array = route_length_estimate(T, A, 0, 1.25 * maxT, epsilon, 1)
+            len_modify_func = lambda x: x if x >= 2 else 2
+            l_array = [len_modify_func(x) for x in l_array]
+            l_mat = np.array(l_array).reshape((A, A))
+            for arr in l_mat:
+                for i in range(len(arr)):
+                    if i < len(arr) - 1:
+                        route_length_file.write(str(arr[i])+' ')
+                    else:
+                        route_length_file.write(str(arr[i]) + '\n')
+    sns.heatmap(data=l_mat, square=True)
+    plt.title('route length estimation (epsilon=%s)' % str(used_pair[0]))
     plt.show()
 
     return maxT
