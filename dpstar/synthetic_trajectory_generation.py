@@ -81,7 +81,7 @@ def syn(A, max_t_len, trip_distribution_path, mobility_model_path, route_length_
             T.append(prev_point)  # 加入起始点
 
             # line 7-10
-            for j in range(2, s):
+            for j in range(1, s-1):
                 # 论文公式，X的s-j倍，寻找X_array下标，超过X_array长度则取最后一个
                 if s - 1 - j - 1 >= X_array_len:
                     X_now = X_array[-1]
