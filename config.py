@@ -30,14 +30,14 @@ beta_factor = 80
 mdl_trajectories_input_dir = 'data/Geolife Trajectories 1.3/MDL1100'
 # the ada grid construction
 top_grid_path = f'data/Geolife Trajectories 1.3/middleware/top_grid_MDL1100_ep{epsilon}.txt'
-# the grid-lized trajectories
+# the grid trajectories
 grid_trajectories_path = f'data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep{epsilon}.txt'
 # the top grid range
 omega_path = f'data/Geolife Trajectories 1.3/middleware/grid_block_gps_range_MDL1100_ep{epsilon}.txt'
 trip_distribution_path = f'data/Geolife Trajectories 1.3/middleware/trip_distribution_MDL1100_ep{epsilon}.txt'
 midpoint_movement_path = f'data/Geolife Trajectories 1.3/middleware/midpoint_movement_MDL1100_ep{epsilon}.txt'
 length_trajectories_path = f'data/Geolife Trajectories 1.3/middleware/length_traj_MDL1100_ep{epsilon}.txt'
-# grid-lized sd trajectories
+# grid sd trajectories
 sd_path = f'data/Geolife Trajectories 1.3/middleware/sd_MDL1100_ep{epsilon}.txt'
 # ture sd trajectories dir
 sd_final_path = f'data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep{epsilon}.txt'
