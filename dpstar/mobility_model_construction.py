@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from config import *
 from utils import ProgressBar
 
 
@@ -64,13 +63,16 @@ def markov_model(trajectory, N, epsilon):
     return O_
 
 
-def mobility_model_main(A, epsilon, src_file=opath_grid_traj, out_file=x_path):
+def mobility_model_main(A, epsilon, src_file, out_file):
     """
 
     主函数
 
     Args:
-
+        A       : 网格数
+        epsilon : 隐私预算
+        src_file: 网格轨迹文件路径
+        out_file: 中间点转移概率矩阵文件路径
     Returns:
 
     """
