@@ -17,7 +17,7 @@ from config import *
 from utils import ProgressBar
 
 
-def trip_distribution(trajectory, N, epsilon):
+def trip_distribution(trajectory, N, epsilon) -> np.ndarray:
     """
 
     获取转移概率矩阵
@@ -32,19 +32,11 @@ def trip_distribution(trajectory, N, epsilon):
 
     """
     R = np.zeros((N, N))  # 建立 N*N 的转移概率矩阵
-    sta_list = []
-    end_list = []
     for t in trajectory:
         if len(t) > 1:
             sta = t[0]
             end = t[-1]
-            sta_list.append(sta)
-            end_list.append(end)
             R[sta][end] += 1
-
-    plt.scatter(sta_list, end_list, s=10)
-    plt.title('trip scatter (epsilon=%s)' % str(used_pair[0]))
-    plt.show()
 
     count = int(np.sum(R))  # 轨迹条数
 
@@ -68,7 +60,7 @@ def trip_distribution(trajectory, N, epsilon):
     return R
 
 
-def trip_distribution_main(A, epsilon, src_file=opath_grid_traj, out_file=r_path):
+def trip_distribution_main(A, epsilon, src_file, out_file):
     """
 
     主函数(将转移概率矩阵写入文件)
@@ -82,8 +74,9 @@ def trip_distribution_main(A, epsilon, src_file=opath_grid_traj, out_file=r_path
     Returns:
 
     """
-    with open(src_file, 'r') as trajectory_file:
-        T = [eval(trajectory) for trajectory in trajectory_file.readlines()]  # 网格轨迹数据(list)
+    with open(src_file, 'r') as grid_trajectories_file:
+        # 网格轨迹数据(list)
+        T = [eval(grid_trajectory) for grid_trajectory in grid_trajectories_file.readlines()]
         with open(out_file, 'w') as trip_distribution_file:
             trip_distribution_matrix = trip_distribution(T, A, epsilon)
             for item in trip_distribution_matrix:
