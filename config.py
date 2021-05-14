@@ -5,18 +5,6 @@
 the config of parm for DP-Star
 """
 from __future__ import (absolute_import, unicode_literals)
-import os
-
-# privacy budget
-epsilon = 0.1
-
-# budget allocation
-epsilon_alloc = {
-    'ag': (1/9) * epsilon,  # adaptive Grid Construction
-    'td': (3/9) * epsilon,  # trip distribution extraction
-    'markov': (3/9) * epsilon,  # mobility model construction
-    'mle': (2/9) * epsilon  # route length estimation(a median length estimation method)
-}
 
 # trajectory geo range
 gps_range = {'lat': (0, 1320), 'lon': (0, 1760)}
@@ -41,7 +29,3 @@ length_traj_path = f'data/Geolife Trajectories 1.3/middleware/length_traj_MDL110
 sd_path = f'data/Geolife Trajectories 1.3/middleware/sd_MDL1100_ep{epsilon}.txt'
 # ture sd trajectories dir
 sd_final_path = f'data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep{epsilon}.txt'
-
-# create sd final path
-# if not os.path.exists(sd_final_path):
-#     os.makedirs(sd_final_path)
