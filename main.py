@@ -3,7 +3,7 @@
 # Author: nomalocaris <nomalocaris.top>
 """"""
 from __future__ import (absolute_import, unicode_literals)
-from dpstar import generate_adaptive_grid
+from dpstar import generate_adaptive_grid, read_mdl_data
 from dpstar import generate_sd_grid_mapping_traj
 from dpstar import trip_distribution_main
 from dpstar import mobility_model_main
@@ -16,17 +16,15 @@ import matplotlib.pyplot as plt
 
 # generate adaptive grid
 n_grid = generate_adaptive_grid(
-    idir_traj=idir_mdl_traj,
-    opath_top_grid=opath_top_grid,
-    opath_grid_traj=opath_grid_traj,
+    idir_traj=mdl_trajectories_input_dir,
+    opath_top_grid=top_grid_path,
+    opath_grid_traj=grid_trajectories_path,
     opath_grid_block_gps_range=omega_path,
     n_top_grid=n_top_grid,
     epsilon_alloc=epsilon_alloc['ag'],
     epsilon_tot=epsilon,
     gps_range=gps_range,
-    add_noise=False,
-    beta_factor=beta_factor,
-    # is_plot=True
+    beta_factor=beta_factor
 )
 
 trip_distribution_main(n_grid, epsilon=epsilon_alloc['td'])
@@ -35,20 +33,36 @@ mobility_model_main(n_grid, epsilon=epsilon_alloc['markov'])
 
 maxT = route_length_estimate_main(n_grid, epsilon=epsilon_alloc['mle'])
 
-syn(n_grid, maxT)
+syn(n_grid, maxT, trip_distribution_path, midpoint_movement_path, length_trajectories_path, sd_path, 14650)
 
-# generate sd traj
+# generate sd trajectory
 generate_sd_grid_mapping_traj(
     ipath_sd=sd_path,
     n_top_grid=n_top_grid,
-    ipath_top_grid=opath_top_grid,
+    ipath_top_grid=top_grid_path,
     ipath_grid_block_gps_range=omega_path,
     odir_sd=sd_final_path,
-    mapping_rate=300,
+    mapping_rate=1100,
     mapping_bais={'lat': 39.6, 'lon': 115.8}
 )
 
-#
+# tot_traj = read_mdl_data(idir_mdl_traj)
+# tot_points = []
+# for traj in tot_traj:
+#     tot_points += traj
+# tot_points = np.array(tot_points)
+# print(tot_points.min(axis=0))
+# print(tot_points.max(axis=0))
+
+# tot_len = 0
+# with open(sd_path) as fr:
+#     tot_traj = [eval(t) for t in fr.readlines()]
+# print(tot_traj)
+# for t in tot_traj:
+#     tot_len += len(t)
+# print('脱敏网格数据总长度: %.4f, 平均长度: %.4f' % (tot_len, tot_len/len(tot_traj)))
+# print(len(tot_traj))
+
 # tot_traj = read_mdl_data(idir_mdl_traj)
 # plt.figure(figsize=(6, 5))
 # for traj in tot_traj:
@@ -64,7 +78,7 @@ generate_sd_grid_mapping_traj(
 #     n_top_grid)
 # for line in top_gird_lines:
 #     plt.plot([x[0] for x in line], [y[1] for y in line], c='black')
-#
+
 # # plot bottom grid lines
 # for i in range(C):
 #     if M[i] > 1:
@@ -82,6 +96,6 @@ generate_sd_grid_mapping_traj(
 # plt.ylabel('Lon')
 # ax = plt.gca()
 # ax.xaxis.set_ticks_position('top')
-#
+
 # plt.savefig('grid_traj')
 # plt.show()

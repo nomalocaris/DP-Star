@@ -1,3 +1,4 @@
+  
 """
 -------------------------------------
 # -*- coding: utf-8 -*-
@@ -10,117 +11,105 @@
 """
 
 import random
+
 import numpy as np
-from config import *
+
 from utils import ProgressBar
 
 
-def syn(A, max_t_len, aa_path=opath_grid_traj, r_path=r_path, x_path=x_path,
-        l_path=l_path, sd_path=sd_path, sd_final_path=sd_final_path, nSyn=14650):
-    """basic description
-
-    detailed description
-
-    Args:
-
-    Returns:
-
+def syn(A, max_t_len, trip_distribution_path, mobility_model_path, route_length_path, sd_path, nSyn):
     """
-    # 输入自适应网格A, trip分布矩阵R，转移矩阵X，中位数长度L，生成轨迹数量nSyn
-    with open(aa_path) as f:
-        AA = list()
-        for line in f.readlines():
-            AA += eval(line)
+    综合轨迹生成
+    Args:
+        A                     : 网格数量
+        max_t_len             : 最大网格轨迹长度
+        trip_distribution_path: 起止点分布概率矩阵路径
+        mobility_model_path   : 马尔可夫转移概率矩阵路径
+        route_length_path     : 轨迹长度估计矩阵
+        sd_path               : 综合生成轨迹路径
+        nSyn                  : 轨迹条数
+    Returns:
+    """
+    # 起止点分布概率矩阵
+    with open(trip_distribution_path, 'r') as r_file:
+        R = np.array([list(map(lambda x: float(x), line.split(' '))) for line in r_file.readlines()])
 
-    # 读trip分布矩阵
-    r_file = open(r_path, 'r')
-    R = []
-    for row in r_file.readlines():
-        row = row.strip()
-        R_ele = []
-        for ele in row.split(' '):
-            R_ele.append(float(ele))
+    # 马尔可夫转移概率矩阵
+    with open(mobility_model_path, 'r') as x_file:
+        X = np.array([list(map(lambda x: float(x), line.split(' '))) for line in x_file.readlines()])
 
-        R.append(R_ele)
-    # 读马尔科夫转移概率矩阵
-    x_file = open(x_path, 'r')
-    X = []
-
-    for row in x_file.readlines():
-        row = row.strip()
-        X_ele = []
-        count = 0
-        for ele in row.split(' '):
-            X_ele.append(float(ele))
-            count += float(ele)
-        X.append(X_ele)
-
-    X_np = np.array(X)
-
-    X_copy = X_np.copy()
+    X_copy = X.copy()
     X_array = [X_copy]
     # 先对转移概率矩阵做乘方，迭代一定次数后基本不变
     for i in range(max_t_len):
-        X_array.append(X_array[i].dot(X_copy))
+        X_array.append(X_array[i] @ X_copy)
 
     X_array_len = len(X_array)
-    # 读轨迹长度矩阵
-    l_file = open(l_path, 'r')
-    L = []
-    for row in l_file.readlines():
-        row = row.strip()
-        for ele in row.split(' '):
-            L.append(float(ele))
 
-    sd_file = open(sd_path, 'w')
+    # 轨迹长度估计矩阵
+    with open(route_length_path, 'r') as l_file:
+        L = [i for each in [list(map(lambda x: float(x), line.split(' '))) for line in l_file.readlines()] for i in each]
 
-    # 开始综合
-    # line 1: Initialize SD as empty set
-    SD = []
-    p1 = ProgressBar(nSyn, '生成网格化的脱敏数据')
-    for i in range(nSyn):
-        p1.update(i)
-        # Pick a sample S = (Cstart, Cend) from Rˆ
-        index_array = [int(j) for j in range(A * A)]
-        R = np.array(R)
+    # 综合
+    with open(sd_path, 'w') as sd_file:
+        # line 1: Initialize SD as empty set
+        SD = []
+        index_list = [j for j in range(A * A)]
         R /= np.sum(R)
-        # 选trip 分布
-        index = np.random.choice(index_array, p=R.ravel())
 
-        start_point = int(index / A)  # 轨迹起点
-        end_point = index - start_point * A  # 轨迹终点
+        p = ProgressBar(nSyn, '生成网格化的脱敏数据')
+        # line 2-6
+        for i in range(nSyn):
+            p.update(i)
+            # Pick a sample S = (C_start, C_end) from Rˆ
+            index = np.random.choice(index_list, p=R.ravel())
 
-        l_now = L[index]  # 轨迹长度参数
-        r_length = random.expovariate(np.log(2) / l_now)  # 指数分布取轨迹长
-        r_length = int(np.round(r_length))  # 整数化
-        if r_length < 2:
-            r_length = 2
-        T = []
-        prev_point = start_point
-        T.append(prev_point)  # 加入起始点
-        # line 7-10
-        for j in range(1, r_length - 1):
-            # 论文公式，X的r_length-j倍，寻找X_array下标，超过X_array长度则取最后一个
-            if r_length - 1 - j - 1 >= X_array_len:
-                X_now = X_array[-1]
-            else:
-                X_now = X_array[r_length - 1 - j - 1]
-            # Sample
-            sample_prob = []
-            for k in range(A):
-                sample_prob.append(X_now[k][end_point] * X_np[prev_point][k])  # 加入取样概率
+            start_point = int(index / A)  # 网格轨迹起点
+            end_point = index - start_point * A  # 网格轨迹终点
 
-            sample_prob = np.array(sample_prob)
-            if np.sum(sample_prob) == 0:
-                continue
-            sample_prob /= np.sum(sample_prob)  # 归一化
-            now_point = np.random.choice([int(m) for m in range(A)], p=sample_prob.ravel())  # 抽样
-            prev_point = now_point  # 更新上一个点
-            T.append(now_point)  # 加入轨迹中
+            l_hat = L[index]  # 轨迹长度参数
 
-        T.append(end_point)  # 加入结束点
-        SD.append(T)  # 加入轨迹
+            s = int(np.round(random.expovariate(np.log(2) / l_hat)))  # 指数分布取轨迹长
+            if s < 2:
+                s = 2
 
-    for sd in SD:
-        sd_file.writelines(str(sd) + '\n')
-    sd_file.close()
+            T = []
+            prev_point = start_point
+            T.append(prev_point)  # 加入起始点
+
+            # line 7-10
+            for j in range(1, s-1):
+                # 论文公式，X的s-j倍，寻找X_array下标，超过X_array长度则取最后一个
+                if s - 1 - j - 1 >= X_array_len:
+                    X_now = X_array[-1]
+                else:
+                    X_now = X_array[s - 1 - j - 1]
+                # Sample
+                sample_prob = []
+                for k in range(A):
+                    sample_prob.append(X_now[k][end_point] * X[prev_point][k])  # 加入取样概率
+
+                sample_prob = np.array(sample_prob)
+                if np.sum(sample_prob) == 0:
+                    continue
+                sample_prob /= np.sum(sample_prob)  # 归一化
+                now_point = np.random.choice([int(m) for m in range(A)], p=sample_prob.ravel())  # 抽样
+                prev_point = now_point  # 更新上一个点
+                T.append(now_point)  # 加入轨迹中
+
+            T.append(end_point)  # 加入结束点
+            SD.append(T)  # 加入轨迹
+
+        for sd in SD:
+            sd_file.writelines(str(sd) + '\n')
+
+
+if __name__ == '__main__':
+    ep_grid_pairs = ((0.1, 67), (0.5, 120), (1.0, 193), (2.0, 364))
+    used_pair = ep_grid_pairs[0]
+    syn(67, 1683,
+        trip_distribution_path=f'../data/Geolife Trajectories 1.3/middleware/trip_distribution_MDL1100_ep{used_pair[0]}.txt',
+        mobility_model_path=f'../data/Geolife Trajectories 1.3/middleware/midpoint_movement_MDL1100_ep{used_pair[0]}.txt',
+        route_length_path=f'../data/Geolife Trajectories 1.3/middleware/length_traj_MDL1100_ep{used_pair[0]}.txt',
+        sd_path=f'../data/Geolife Trajectories 1.3/middleware/sd_MDL1100_ep{used_pair[0]}.txt',
+        nSyn=14650)
