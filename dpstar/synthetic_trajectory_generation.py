@@ -74,6 +74,8 @@ def syn(A, max_t_len, aa_path=opath_grid_traj, r_path=r_path, x_path=x_path,
 
     sd_file = open(sd_path, 'w')
 
+    # test
+    l_exp_arr = []
     # 开始综合
     # line 1: Initialize SD as empty set
     SD = []
@@ -93,8 +95,12 @@ def syn(A, max_t_len, aa_path=opath_grid_traj, r_path=r_path, x_path=x_path,
         l_now = L[index]  # 轨迹长度参数
         r_length = random.expovariate(np.log(2) / l_now)  # 指数分布取轨迹长
         r_length = int(np.round(r_length))  # 整数化
+
         if r_length < 2:
             r_length = 2
+
+        l_exp_arr.append(r_length)
+
         T = []
         prev_point = start_point
         T.append(prev_point)  # 加入起始点
@@ -120,7 +126,7 @@ def syn(A, max_t_len, aa_path=opath_grid_traj, r_path=r_path, x_path=x_path,
 
         T.append(end_point)  # 加入结束点
         SD.append(T)  # 加入轨迹
-
+    print('脱敏网格数据总长度: %.4f, 平均长度: %.4f' % (np.sum(l_exp_arr), np.mean(l_exp_arr)))
     for sd in SD:
         sd_file.writelines(str(sd) + '\n')
     sd_file.close()

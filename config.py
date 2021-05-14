@@ -8,7 +8,7 @@ from __future__ import (absolute_import, unicode_literals)
 import os
 
 # privacy budget
-epsilon = 2.0
+epsilon = 0.1
 
 # budget allocation
 epsilon_alloc = {
