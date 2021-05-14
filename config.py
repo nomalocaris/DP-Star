@@ -27,22 +27,21 @@ n_top_grid = 7
 # a significant parm for adaptive grid, the smaller it is, the more bottom grid will be generate.
 beta_factor = 80
 
-# files path
-idir_mdl_traj = 'data/Geolife Trajectories 1.3/MDL1100'  # the mdl traj file
+mdl_trajectories_input_dir = 'data/Geolife Trajectories 1.3/MDL1100'
 # the ada grid construction
-opath_top_grid = 'data/Geolife Trajectories 1.3/middleware/top_grid_MDL1100_ep' + str(epsilon) + '.txt'
-# the grid-lized traj
-opath_grid_traj = 'data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep' + str(epsilon) + '.txt'
+top_grid_path = f'data/Geolife Trajectories 1.3/middleware/top_grid_MDL1100_ep{epsilon}.txt'
+# the grid trajectories
+grid_trajectories_path = f'data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep{epsilon}.txt'
 # the top grid range
-omega_path = 'data/Geolife Trajectories 1.3/middleware/grid_block_gps_range_MDL1100_ep' + str(epsilon) + '.txt'
-r_path = 'data/Geolife Trajectories 1.3/middleware/trip_distribution_MDL1100_ep' + str(epsilon) + '.txt'
-x_path = 'data/Geolife Trajectories 1.3/middleware/midpoint_movement_MDL1100_ep' + str(epsilon) + '.txt'
-l_path = 'data/Geolife Trajectories 1.3/middleware/length_traj_MDL1100_ep' + str(epsilon) + '.txt'
-sd_path = 'data/Geolife Trajectories 1.3/middleware/sd_MDL1100_ep' + str(epsilon) + '.txt'  # grid-lized sd traj
-sd_final_path = 'data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep' + str(epsilon)  # ture sd traj dir
+omega_path = f'data/Geolife Trajectories 1.3/middleware/grid_block_gps_range_MDL1100_ep{epsilon}.txt'
+trip_distribution_path = f'data/Geolife Trajectories 1.3/middleware/trip_distribution_MDL1100_ep{epsilon}.txt'
+midpoint_movement_path = f'data/Geolife Trajectories 1.3/middleware/midpoint_movement_MDL1100_ep{epsilon}.txt'
+length_trajectories_path = f'data/Geolife Trajectories 1.3/middleware/length_traj_MDL1100_ep{epsilon}.txt'
+# grid sd trajectories
+sd_path = f'data/Geolife Trajectories 1.3/middleware/sd_MDL1100_ep{epsilon}.txt'
+# ture sd trajectories dir
+sd_final_path = f'data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep{epsilon}.txt'
 
 # create sd final path
-if not os.path.exists(sd_final_path):
-    os.makedirs(sd_final_path)
-
-
+# if not os.path.exists(sd_final_path):
+#     os.makedirs(sd_final_path)
