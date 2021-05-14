@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 n_grid = generate_adaptive_grid(
     idir_traj=mdl_trajectories_input_dir,
     opath_top_grid=top_grid_path,
-    opath_grid_traj=grid_trajectories_path,
+    opath_grid_traj=grid_traj_path,
     opath_grid_block_gps_range=omega_path,
     n_top_grid=n_top_grid,
     epsilon_alloc=epsilon_alloc['ag'],
@@ -27,13 +27,16 @@ n_grid = generate_adaptive_grid(
     beta_factor=beta_factor
 )
 
-trip_distribution_main(n_grid, epsilon=epsilon_alloc['td'])
+trip_distribution_main(n_grid, epsilon=epsilon_alloc['td'],
+                       src_file=grid_traj_path, out_file=trip_distribution_path)
 
-mobility_model_main(n_grid, epsilon=epsilon_alloc['markov'])
+mobility_model_main(n_grid, epsilon=epsilon_alloc['markov'],
+                    src_file=grid_traj_path, out_file=midpoint_movement_path)
 
-maxT = route_length_estimate_main(n_grid, epsilon=epsilon_alloc['mle'])
+maxT = route_length_estimate_main(n_grid, epsilon=epsilon_alloc['mle'],
+                                  src_file=grid_traj_path, out_file=length_traj_path)
 
-syn(n_grid, maxT, trip_distribution_path, midpoint_movement_path, length_trajectories_path, sd_path, 14650)
+syn(n_grid, maxT, trip_distribution_path, midpoint_movement_path, length_traj_path, sd_path, 14650)
 
 # generate sd trajectory
 generate_sd_grid_mapping_traj(
