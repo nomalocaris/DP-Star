@@ -18,17 +18,13 @@ from utils import ProgressBar
 
 def trip_distribution(trajectory, N, epsilon) -> np.ndarray:
     """
-
     获取转移概率矩阵
-
     Args:
         trajectory: 轨迹数据(二维数组)
         N         : 二级网格数
         epsilon   : 隐私预算
-
     Returns:
         R: 转移概率矩阵
-
     """
     R = np.zeros((N, N))  # 建立 N*N 的转移概率矩阵
     for t in trajectory:
@@ -61,17 +57,13 @@ def trip_distribution(trajectory, N, epsilon) -> np.ndarray:
 
 def trip_distribution_main(A, epsilon, src_file, out_file):
     """
-
     主函数(将转移概率矩阵写入文件)
-
     Args:
         A       : 网格数
         epsilon : 隐私预算
         src_file: 网格轨迹文件路径
         out_file: 转移概率矩阵输出文件路径
-
     Returns:
-
     """
     with open(src_file, 'r') as grid_trajectories_file:
         # 网格轨迹数据(list)
