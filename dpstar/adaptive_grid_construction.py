@@ -282,7 +282,7 @@ def generate_sd_grid_mapping_traj(ipath_sd, n_top_grid, ipath_top_grid, ipath_gr
 
     # privacy budget
     with open(ipath_sd) as fr_sd:
-        sd = [eval(point.replace('\n', '')) for point in fr_sd.readlines()]
+        sd = [eval(point) for point in fr_sd.readlines()]
     # C = n_top_grid ** 2
     # with open(ipath_top_grid) as fr_top_grid:
     #     M = eval(fr_top_grid.readline())

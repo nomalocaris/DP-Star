@@ -1,3 +1,4 @@
+  
 """
 -------------------------------------
 # -*- coding: utf-8 -*-
@@ -18,9 +19,7 @@ from utils import ProgressBar
 
 def syn(A, max_t_len, trip_distribution_path, mobility_model_path, route_length_path, sd_path, nSyn):
     """
-
     综合轨迹生成
-
     Args:
         A                     : 网格数量
         max_t_len             : 最大网格轨迹长度
@@ -29,9 +28,7 @@ def syn(A, max_t_len, trip_distribution_path, mobility_model_path, route_length_
         route_length_path     : 轨迹长度估计矩阵
         sd_path               : 综合生成轨迹路径
         nSyn                  : 轨迹条数
-
     Returns:
-
     """
     # 起止点分布概率矩阵
     with open(trip_distribution_path, 'r') as r_file:
