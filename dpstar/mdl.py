@@ -2,9 +2,10 @@
 # -*-coding:utf-8-*-
 # Author: nomalocaris <nomalocaris.top>
 """"""
-import numpy as np
 import os
-from utilis import vlen, ProgressBar, to_vec_add, to_vec_sub, to_vec_times, to_vec_dot
+
+import numpy as np
+from utils import vlen, ProgressBar, to_vec_add, to_vec_sub, to_vec_times, to_vec_dot
 
 
 def lt(t_traj, start_ind, curr_ind):
@@ -16,6 +17,7 @@ def lt(t_traj, start_ind, curr_ind):
     :return:
     """
     vlength = vlen(t_traj[start_ind], t_traj[curr_ind])
+
     return np.log2(vlength) if vlength else np.spacing(1)
 
 
@@ -27,6 +29,7 @@ def cal_perpendicular(si, ei, sj, ej):
     :param sj:
     :param ej:
     :return:
+
     """
     sisj = to_vec_sub(sj, si)
     siei = to_vec_sub(ei, si)
