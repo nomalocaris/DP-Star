@@ -4,8 +4,8 @@
 """Geolife 轨迹提取相关函数"""
 import random
 import os
-from utilis import cal_time_interval
-from utilis import ProgressBar
+from utils import cal_time_interval
+from utils import ProgressBar
 import numpy as np
 
 
@@ -23,7 +23,6 @@ def extract_dataset(lat_lon,
     :param rand_num:所有数据的数量,14650
     :return:
     """
-    max_time = 0
     D = []
     file_list = []
     traj_fs = os.listdir(base_path)
@@ -35,11 +34,7 @@ def extract_dataset(lat_lon,
         files = os.listdir(file_path)  # 打开文件夹
         for f in files:  # 遍历文件
             line_count = 0  # 轨迹段计数
-            # print(file_path + f)
             with open(file_path + f) as fr:
-                # for line in fr.readlines():
-                #     print(line)
-                # print(type(fr.readlines()))
                 T = []
                 prev_time = 0
                 lines = fr.readlines()
@@ -55,11 +50,8 @@ def extract_dataset(lat_lon,
                         if line_count > 1:
                             now_time = now_line_time
                             t_interval = cal_time_interval(prev_time, now_time)
-                            if t_interval > max_time:
-                                # 轨迹间隔超过2mins, 退出读取
-                                max_time = t_interval
-                            if t_interval > 6950:
-                                # 轨迹间隔超过2mins, 退出读取
+                            if t_interval > 120:
+                                # 轨迹间隔超过一定范围, 退出读取
                                 break
                         prev_time = now_line_time
                         T.append((now_line_latitude, now_line_longitude))
@@ -74,7 +66,6 @@ def extract_dataset(lat_lon,
                     continue
                 D.append(T)
                 file_list.append(base_name + '_' + f)
-    print("最大用时：", max_time)
     rand_ind = random.sample([i for i in range(len(file_list))], rand_num)  # 随机抽取轨迹
     with open(good_traj_file, 'w') as f2:
         p2 = ProgressBar(rand_num, '写入文件')
@@ -108,7 +99,7 @@ def check_data():
 
 
 if __name__ == '__main__':
-    # extract_dataset([39.6, 40.8, 115.8, 117.4], '../data/Geolife Trajectories 1.3/good_traj_file.txt',
-    #                 '../data/Geolife Trajectories 1.3/Trajectories/',
-    #                 '../data/Geolife Trajectories 1.3/Geolife Trajectories 1.3/Data', 14650)
-    check_data()
+    extract_dataset([39.4, 41.6, 115.7, 117.4], 'data/Geolife Trajectories 1.3/good_traj_file.txt',
+                    'data/Geolife Trajectories 1.3/Trajectories/',
+                    'data/Geolife Trajectories 1.3/Geolife Trajectories 1.3/Data', 14650)
+    # check_data()
