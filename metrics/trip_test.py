@@ -8,8 +8,8 @@ import datetime
 
 
 def KLD(p, q):     #计算KL散度
-    p = p + np.spacing(1)
-    q = q + np.spacing(1)
+    p += np.spacing(1)
+    q += np.spacing(1)
     # print(p/q)
     return sum([_p * log(_p/_q) for (_p,_q) in zip(p,q)])
 
