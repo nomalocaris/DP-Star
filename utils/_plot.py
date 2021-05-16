@@ -10,11 +10,12 @@ import matplotlib.pyplot as plt
 from utils import ProgressBar
 
 
-def plot_scatter(points, fig_size=(6, 6), color='purple', size=5):
+def plot_scatter(points, fig_size=(6, 6), color='mediumpurple', size=5, title=''):
     """plot the points
     """
     plt.figure(figsize=fig_size)
     plt.scatter(x=[p[0] for p in points], y=[p[1] for p in points], color=color, s=size)
+    plt.title(title)
     plt.show()
 
 
