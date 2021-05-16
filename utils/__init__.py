@@ -4,6 +4,7 @@
 """"""
 from __future__ import (absolute_import, unicode_literals)
 from ._progressbar import ProgressBar
+from _vector_cal import to_vec_add, to_vec_sub, to_vec_times, to_vec_dot
 from ._plot import plot_scatter, plot_traj
 from ._vector_cal import to_vec_add, to_vec_sub, to_vec_times, to_vec_dot
 import os
