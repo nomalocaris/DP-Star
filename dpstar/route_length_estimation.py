@@ -139,6 +139,8 @@ def route_length_estimate_main(n_grid: int, _epsilon: float, grid_trajs_path: st
                     else:
                         routes_length_file.write(str(arr[i]) + '\n')
 
+    print('最大网格轨迹长度: %d' % maxT)
+
     return maxT
 
 
