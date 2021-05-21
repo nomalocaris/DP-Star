@@ -1,4 +1,3 @@
-  
 """
 -------------------------------------
 # -*- coding: utf-8 -*-
@@ -17,26 +16,31 @@ import numpy as np
 from utils import ProgressBar
 
 
-def syn(A, max_t_len, trip_distribution_path, mobility_model_path, route_length_path, sd_path, nSyn):
+def synthetic_trajs(n_grid: int, max_t_len: int, trip_distribution_path: str,
+                    midpoint_movement_path: str, routes_length_path: str, sd_path: str, nSyn: int):
     """
+
     综合轨迹生成
+
     Args:
-        A                     : 网格数量
+        n_grid                : 网格数量
         max_t_len             : 最大网格轨迹长度
         trip_distribution_path: 起止点分布概率矩阵路径
-        mobility_model_path   : 马尔可夫转移概率矩阵路径
-        route_length_path     : 轨迹长度估计矩阵
+        midpoint_movement_path: 马尔可夫转移概率矩阵路径
+        routes_length_path    : 轨迹长度估计矩阵
         sd_path               : 综合生成轨迹路径
         nSyn                  : 轨迹条数
+
     Returns:
+
     """
     # 起止点分布概率矩阵
-    with open(trip_distribution_path, 'r') as r_file:
-        R = np.array([list(map(lambda x: float(x), line.split(' '))) for line in r_file.readlines()])
+    with open(trip_distribution_path, 'r') as trip_distribution_file:
+        R = np.array([list(map(lambda x: float(x), line.split(' '))) for line in trip_distribution_file.readlines()])
 
     # 马尔可夫转移概率矩阵
-    with open(mobility_model_path, 'r') as x_file:
-        X = np.array([list(map(lambda x: float(x), line.split(' '))) for line in x_file.readlines()])
+    with open(midpoint_movement_path, 'r') as midpoint_movement_file:
+        X = np.array([list(map(lambda x: float(x), line.split(' '))) for line in midpoint_movement_file.readlines()])
 
     X_copy = X.copy()
     X_array = [X_copy]
@@ -47,14 +51,14 @@ def syn(A, max_t_len, trip_distribution_path, mobility_model_path, route_length_
     X_array_len = len(X_array)
 
     # 轨迹长度估计矩阵
-    with open(route_length_path, 'r') as l_file:
-        L = [i for each in [list(map(lambda x: float(x), line.split(' '))) for line in l_file.readlines()] for i in each]
+    with open(routes_length_path, 'r') as routes_length_file:
+        L = [i for each in [list(map(lambda x: float(x), line.split(' '))) for line in routes_length_file.readlines()] for i in each]
 
     # 综合
     with open(sd_path, 'w') as sd_file:
         # line 1: Initialize SD as empty set
         SD = []
-        index_list = [j for j in range(A * A)]
+        index_list = [j for j in range(n_grid * n_grid)]
         R /= np.sum(R)
 
         p = ProgressBar(nSyn, '生成网格化的脱敏数据')
@@ -64,8 +68,8 @@ def syn(A, max_t_len, trip_distribution_path, mobility_model_path, route_length_
             # Pick a sample S = (C_start, C_end) from Rˆ
             index = np.random.choice(index_list, p=R.ravel())
 
-            start_point = int(index / A)  # 网格轨迹起点
-            end_point = index - start_point * A  # 网格轨迹终点
+            start_point = int(index / n_grid)  # 网格轨迹起点
+            end_point = index - start_point * n_grid  # 网格轨迹终点
 
             l_hat = L[index]  # 轨迹长度参数
 
@@ -86,14 +90,14 @@ def syn(A, max_t_len, trip_distribution_path, mobility_model_path, route_length_
                     X_now = X_array[s - 1 - j - 1]
                 # Sample
                 sample_prob = []
-                for k in range(A):
+                for k in range(n_grid):
                     sample_prob.append(X_now[k][end_point] * X[prev_point][k])  # 加入取样概率
 
                 sample_prob = np.array(sample_prob)
                 if np.sum(sample_prob) == 0:
                     continue
                 sample_prob /= np.sum(sample_prob)  # 归一化
-                now_point = np.random.choice([int(m) for m in range(A)], p=sample_prob.ravel())  # 抽样
+                now_point = np.random.choice([int(m) for m in range(n_grid)], p=sample_prob.ravel())  # 抽样
                 prev_point = now_point  # 更新上一个点
                 T.append(now_point)  # 加入轨迹中
 
@@ -105,11 +109,10 @@ def syn(A, max_t_len, trip_distribution_path, mobility_model_path, route_length_
 
 
 if __name__ == '__main__':
-    ep_grid_pairs = ((0.1, 67), (0.5, 120), (1.0, 193), (2.0, 364))
-    used_pair = ep_grid_pairs[0]
-    syn(67, 1683,
-        trip_distribution_path=f'../data/Geolife Trajectories 1.3/middleware/trip_distribution_MDL1100_ep{used_pair[0]}.txt',
-        mobility_model_path=f'../data/Geolife Trajectories 1.3/middleware/midpoint_movement_MDL1100_ep{used_pair[0]}.txt',
-        route_length_path=f'../data/Geolife Trajectories 1.3/middleware/length_traj_MDL1100_ep{used_pair[0]}.txt',
-        sd_path=f'../data/Geolife Trajectories 1.3/middleware/sd_MDL1100_ep{used_pair[0]}.txt',
-        nSyn=14650)
+    epsilon = 0.1
+    synthetic_trajs(64, 235,
+                    f'../data/Geolife Trajectories 1.3/middleware/trip_distribution_epsilon_{epsilon}.txt',
+                    f'../data/Geolife Trajectories 1.3/middleware/midpoint_movement_epsilon_{epsilon}.txt',
+                    f'../data/Geolife Trajectories 1.3/middleware/routes_length_epsilon_{epsilon}.txt',
+                    f'../data/Geolife Trajectories 1.3/middleware/sd_epsilon_{epsilon}.txt',
+                    14650)
