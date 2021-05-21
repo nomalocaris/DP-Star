@@ -1,32 +1,43 @@
-#!/usr/bin/env python
-# -*-coding:utf-8-*-
-# Author: nomalocaris <nomalocaris.top>
-"""Geolife 轨迹提取相关函数"""
-import random
+"""
+-------------------------------------
+# -*- coding: utf-8 -*-
+# @Author  : nomalocaris、Giyn、HZT
+# @File    : extract_data.py
+# @Software: PyCharm
+-------------------------------------
+"""
+
 import os
-from utils import cal_time_interval
-from utils import ProgressBar
+import random
+
 import numpy as np
 
+from utils import ProgressBar
+from utils import cal_time_interval
 
-def extract_dataset(lat_lon,
-                    good_traj_file,
-                    init_path,
-                    base_path,
-                    rand_num=14650):
+
+def extract_dataset(lat_lon, trajs_name_file, init_path, base_path, rand_num):
     """
+
     对数据进行抽取
-    :param lat_lon:经纬度的界限值
-    :param good_traj_file:用于存储Trajectory里面的文件名
-    :param init_path:抽取后数据的存储路径
-    :param base_path:原始数据
-    :param rand_num:所有数据的数量,14650
-    :return:
+
+    Args:
+        lat_lon        : 经纬度的界限值
+        trajs_name_file: 用于存储Trajectory里面的文件名
+        init_path      : 抽取后数据的存储路径
+        base_path      : 原始数据
+        rand_num       : 所有数据的数量
+
+    Returns:
+
     """
+    if not os.path.exists(init_path):
+        os.makedirs(init_path)
     D = []
     file_list = []
     traj_fs = os.listdir(base_path)
     p1 = ProgressBar(len(traj_fs), '提取轨迹')
+
     for t in range(len(traj_fs)):  # 0-181名用户的轨迹数据
         p1.update(t)
         base_name = traj_fs[t]
@@ -66,8 +77,9 @@ def extract_dataset(lat_lon,
                     continue
                 D.append(T)
                 file_list.append(base_name + '_' + f)
+
     rand_ind = random.sample([i for i in range(len(file_list))], rand_num)  # 随机抽取轨迹
-    with open(good_traj_file, 'w') as f2:
+    with open(trajs_name_file, 'w') as f2:
         p2 = ProgressBar(rand_num, '写入文件')
         for i in range(rand_num):
             p2.update(i)
@@ -77,29 +89,45 @@ def extract_dataset(lat_lon,
                     f3.writelines(str(step[0]) + ',' + str(step[1]) + '\n')
 
 
-def EDistant(m, n):
+def euclidean_distance(m, n):
     """
+
     计算欧式距离
-    :param m:数据1
-    :param n:数据2
-    :return:
+
+    Args:
+
+        m: 数据1
+        n: 数据2
+
+    Returns:
+
     """
     return np.sqrt((m-n)[0]**2 + (m-n)[1]**2)
 
 
 def check_data():
+    """
+
+    检查数据
+
+    Args:
+
+    Returns:
+
+    """
     length_ = []
-    base_path_list = os.listdir('../data/Geolife Trajectories 1.3/Trajectories7000/')
+    base_path_list = os.listdir('../data/Geolife Trajectories 1.3/Trajectories/')
     for path in base_path_list:
-        file_object = open('../data/Geolife Trajectories 1.3/Trajectories7000/' + path, 'r')
-        length_.append(len(file_object.readlines()))
+        with open('../data/Geolife Trajectories 1.3/Trajectories/' + path, 'r') as file_object:
+            length_.append(len(file_object.readlines()))
     print(length_)
     print(np.mean(length_))
     print(np.std(length_, ddof=1))
 
 
 if __name__ == '__main__':
-    extract_dataset([39.4, 41.6, 115.7, 117.4], 'data/Geolife Trajectories 1.3/good_traj_file.txt',
-                    'data/Geolife Trajectories 1.3/Trajectories/',
-                    'data/Geolife Trajectories 1.3/Geolife Trajectories 1.3/Data', 14650)
-    # check_data()
+    extract_dataset([39.4, 41.6, 115.7, 117.4],
+                    '../data/Geolife Trajectories 1.3/trajs_name_file.txt',
+                    '../data/Geolife Trajectories 1.3/Trajectories/',
+                    '../data/Geolife Trajectories 1.3/Data', 14650)
+    check_data()
