@@ -1,13 +1,26 @@
-# -*- encoding:utf-8 -*-
-import numpy as np
-from math import log
+"""
+-------------------------------------
+# -*- coding: utf-8 -*-
+# @Author  :
+             nomalocaris
+             Giyn
+             HZT
+# @File    : diameter_error.py
+# @Software: PyCharm
+-------------------------------------
+"""
+
 import os
-from utilis import ProgressBar
+from math import log
+
+import numpy as np
+from utils import ProgressBar
 
 
 def KLD(p, q):     # 计算KL散度
     p += np.spacing(1)
     q += np.spacing(1)
+
     return sum([_p * log(_p/_q) for (_p, _q) in zip(p, q)])
 
 
