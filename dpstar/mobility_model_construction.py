@@ -9,30 +9,28 @@
 -------------------------------------
 """
 
-import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
 
 from utils import ProgressBar
 
 
-def markov_model(trajectory, N, epsilon):
+def markov_model(trajs: list, n_grid: int, _epsilon: float) -> np.ndarray:
     """
 
     马尔可夫模型
 
     Args:
-        trajectory: 轨迹数据(二维数组)
-        N         : 二级网格数
-        epsilon   : 隐私预算
+        trajs   : 轨迹数据(二维数组)
+        n_grid  : 二级网格数
+        _epsilon: 隐私预算
 
     Returns:
         O_: 中间点转移概率矩阵
 
     """
-    O_ = np.zeros((N, N))  # 建立 N*N 的转移概率矩阵
-    for t in trajectory:
-        O_sub = np.zeros((N, N))
+    O_ = np.zeros((n_grid, n_grid))  # 建立 n_grid * n_grid 的转移概率矩阵
+    for t in trajs:
+        O_sub = np.zeros((n_grid, n_grid))
         for i in range(len(t) - 1):
             curr_point = t[i]
             next_point = t[i + 1]
@@ -40,54 +38,49 @@ def markov_model(trajectory, N, epsilon):
         O_sub /= (len(t) - 1)  # 该轨迹的转移概率
         O_ += O_sub
 
-    p = ProgressBar(N, '生成中间点转移概率矩阵')
-    for i in range(N):
+    p = ProgressBar(n_grid, '生成中间点转移概率矩阵')
+    for i in range(n_grid):
         p.update(i)
-        for j in range(N):
-            noise = np.random.laplace(0, 1 / epsilon)  # 添加拉普拉斯噪声
+        for j in range(n_grid):
+            noise = np.random.laplace(0, 1 / _epsilon)  # 添加拉普拉斯噪声
             O_[i][j] += noise
 
             if O_[i][j] < 0:
                 O_[i][j] = 0
 
     # compute X
-    row_sum = [sum(O_[i]) for i in range(N)]
-    for j in range(N):
+    row_sum = [sum(O_[i]) for i in range(n_grid)]
+    for j in range(n_grid):
         O_[j] /= row_sum[j]
-
-    # 绘制矩阵热力图
-    sns.heatmap(data=O_, square=True)
-    plt.title('mobility model construction matrix (epsilon=%s)' % str(used_pair[0]))
-    plt.show()
 
     return O_
 
 
-def mobility_model_main(A, epsilon, src_file, out_file):
+def mobility_model_main(n_grid: int, _epsilon: float, grid_trajs_path: str,
+                        midpoint_movement_path: str):
     """
 
     主函数
 
     Args:
-        A       : 网格数
-        epsilon : 隐私预算
-        src_file: 网格轨迹文件路径
-        out_file: 中间点转移概率矩阵文件路径
+        n_grid                : 网格数
+        _epsilon              : 隐私预算
+        grid_trajs_path       : 网格轨迹文件路径
+        midpoint_movement_path: 中间点转移概率矩阵文件路径
     Returns:
 
     """
-    with open(src_file, 'r') as trajectory_file:
-        T = [eval(trajectory) for trajectory in trajectory_file.readlines()]  # 网格轨迹数据(list)
-        with open(out_file, 'w') as midpoint_movement_file:
-            midpoint_movement_matrix = markov_model(T, A, epsilon)
+    with open(grid_trajs_path, 'r') as grid_trajs_file:
+        T = [eval(traj) for traj in grid_trajs_file.readlines()]  # 网格轨迹数据(list)
+        with open(midpoint_movement_path, 'w') as midpoint_movement_file:
+            midpoint_movement_matrix = markov_model(T, n_grid, _epsilon)
             for item in midpoint_movement_matrix:
                 each_line = ' '.join([str(i) for i in item]) + '\n'
                 midpoint_movement_file.writelines(each_line)
 
 
 if __name__ == '__main__':
-    ep_grid_pairs = ((0.1, 67), (0.5, 120), (1.0, 193), (2.0, 364))
-    used_pair = ep_grid_pairs[0]
-    mobility_model_main(used_pair[1], used_pair[0] * 1 / 9,
-                        f'../data/Geolife Trajectories 1.3/middleware/grid_traj_MDL1100_ep{used_pair[0]}.txt',
-                        f'../data/Geolife Trajectories 1.3/middleware/midpoint_movement_MDL1100_ep{used_pair[0]}.txt')
+    epsilon = 0.1
+    mobility_model_main(64, epsilon * 3 / 9,
+                        f'../data/Geolife Trajectories 1.3/Middleware/grid_trajs_epsilon_{epsilon}.txt',
+                        f'../data/Geolife Trajectories 1.3/Middleware/midpoint_movement_epsilon_{epsilon}.txt')

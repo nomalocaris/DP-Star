@@ -210,7 +210,7 @@ def mdl_main(min_latitude, min_longitude, init_path, preserve_path, rate):
                     f3.writelines(str(item) + '\n')
 
 
-def cheak(path='../data/QG Taxi/MDL/'):
+def cheak(path='../data/Geolife Trajectories 1.3/MDL/'):
     base_path_list = os.listdir(path)
     for i in range(len(base_path_list)):
         path_ = base_path_list[i]
@@ -221,9 +221,9 @@ def cheak(path='../data/QG Taxi/MDL/'):
 
 def check_data():
     length_ = []
-    base_path_list = os.listdir('../data/QG Taxi/MDL/')
+    base_path_list = os.listdir('../data/Geolife Trajectories 1.3/MDL/')
     for path in base_path_list:
-        file_object = open('../data/QG Taxi/MDL/' + path, 'r')
+        file_object = open('../data/Geolife Trajectories 1.3/MDL/' + path, 'r')
         length_.append(len(file_object.readlines()))
     print(length_)
     print(np.mean(length_))
@@ -231,8 +231,8 @@ def check_data():
 
 
 if __name__ == '__main__':
-    mdl_main(22.8, 112.7,
-             '../data/QG Taxi/Trajectories/',
-             '../data/QG Taxi/MDL/', 1200)
+    mdl_main(39.6, 115.8,
+             '../data/Geolife Trajectories 1.3/Trajectories/',
+             '../data/Geolife Trajectories 1.3/MDL/', 1200)
     cheak()
     check_data()

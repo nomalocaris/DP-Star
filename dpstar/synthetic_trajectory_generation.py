@@ -111,8 +111,8 @@ def synthetic_trajs(n_grid: int, max_t_len: int, trip_distribution_path: str,
 if __name__ == '__main__':
     epsilon = 0.1
     synthetic_trajs(64, 235,
-                    f'../data/Geolife Trajectories 1.3/Middleware/trip_distribution_epsilon_{epsilon}.txt',
-                    f'../data/Geolife Trajectories 1.3/Middleware/midpoint_movement_epsilon_{epsilon}.txt',
-                    f'../data/Geolife Trajectories 1.3/Middleware/routes_length_epsilon_{epsilon}.txt',
-                    f'../data/Geolife Trajectories 1.3/Middleware/sd_epsilon_{epsilon}.txt',
+                    f'../data/Geolife Trajectories 1.3/middleware/trip_distribution_epsilon_{epsilon}.txt',
+                    f'../data/Geolife Trajectories 1.3/middleware/midpoint_movement_epsilon_{epsilon}.txt',
+                    f'../data/Geolife Trajectories 1.3/middleware/routes_length_epsilon_{epsilon}.txt',
+                    f'../data/Geolife Trajectories 1.3/middleware/sd_epsilon_{epsilon}.txt',
                     14650)
