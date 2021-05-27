@@ -1,18 +1,29 @@
-import numpy as np
+"""
+-------------------------------------
+# -*- coding: utf-8 -*-
+# @Author  : HZT
+# @File    : FP_KT.py
+# @Software: PyCharm
+-------------------------------------
+"""
+
 import os
 
 pattern = ['Frequent_Pattern_init.txt', 'Frequent_Pattern_sd.txt']
-path_list = ['../../data/Geolife Trajectories 1.3/Trajectories7000/', '../../data/Geolife Trajectories '
-                                                                      '1.3/sd/sd_final_MDL1100_ep0.1/',
+path_list = ['../../data/Geolife Trajectories 1.3/Trajectories7000/',
+             '../../data/Geolife Trajectories '
+             '1.3/sd/sd_final_MDL1100_ep0.1/',
              '../../data/Geolife '
              'Trajectories '
              '1.3/sd/sd_final_MDL1100_ep0.5/',
-             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep1.0/', '../../data/Geolife Trajectories '
-                                                                               '1.3/sd/sd_final_MDL1100_ep2.0/']
-path_test = ['../../data/Geolife Trajectories 1.3/Trajectories7000/', '../../data/Geolife Trajectories '
-                                                                      '1.3/test/0/', '../../data/Geolife '
-                                                                                     'Trajectories '
-                                                                                     '1.3/test/1/',
+             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep1.0/',
+             '../../data/Geolife Trajectories '
+             '1.3/sd/sd_final_MDL1100_ep2.0/']
+path_test = ['../../data/Geolife Trajectories 1.3/Trajectories7000/',
+             '../../data/Geolife Trajectories '
+             '1.3/test/0/', '../../data/Geolife '
+                            'Trajectories '
+                            '1.3/test/1/',
              '../../data/Geolife Trajectories 1.3/test/2/', '../../data/Geolife Trajectories '
                                                             '1.3/test/3/']
 
@@ -85,7 +96,8 @@ def get_Fredata(para="init"):
 
     Fre_dict = {}
     for line in f.readlines():
-        Fre_dict[tuple((line.split(':')[0].strip()[1:-1]).split(','))] = int(line.split(':')[1].strip())
+        Fre_dict[tuple((line.split(':')[0].strip()[1:-1]).split(','))] = int(
+            line.split(':')[1].strip())
     dict_ = {}
     for item in sorted(Fre_dict.items(), key=lambda x: x[1], reverse=True):
         dict_[item[0]] = item[1]
@@ -137,10 +149,12 @@ def get_KT(init_dict, sd_dict):
         if list(init_dict.keys())[i] in sd_dict.keys():
             for j in range(i + 1, len(list(init_dict.keys())[:k])):
                 if list(init_dict.keys())[j] in sd_dict.keys():
-                    if (init_dict[list(init_dict.keys())[i]] >= init_dict[list(init_dict.keys())[j]] and sd_dict[
-                        list(init_dict.keys())[i]] > sd_dict[list(init_dict.keys())[j]]) or \
-                            (init_dict[list(init_dict.keys())[i]] < init_dict[list(init_dict.keys())[j]] and sd_dict[
-                                list(init_dict.keys())[i]] < sd_dict[list(init_dict.keys())[j]]):
+                    if (init_dict[list(init_dict.keys())[i]] >= init_dict[
+                        list(init_dict.keys())[j]] and sd_dict[
+                            list(init_dict.keys())[i]] > sd_dict[list(init_dict.keys())[j]]) or \
+                            (init_dict[list(init_dict.keys())[i]] < init_dict[
+                                list(init_dict.keys())[j]] and sd_dict[
+                                 list(init_dict.keys())[i]] < sd_dict[list(init_dict.keys())[j]]):
                         concor_count += 1
                     else:
                         discor_count += 1
@@ -157,15 +171,15 @@ def get_KT(init_dict, sd_dict):
     #         else:
     #             discor_count += 1
     # print("KT差值：", (concor_count - discor_count))
-    KT = (concor_count - discor_count) / (50*49 / 2)
+    KT = (concor_count - discor_count) / (50 * 49 / 2)
     return KT
 
 
 def get_check(init_path='../../data/Geolife Trajectories 1.3/Trajectories7000/',
-                         min_latitude=39.6001216362634,
-                         min_longitude=115.80024136052477,
-                         len_latitude=1.2006028726893376,
-                         len_longitude=1.6006907968450292):
+              min_latitude=39.6001216362634,
+              min_longitude=115.80024136052477,
+              len_latitude=1.2006028726893376,
+              len_longitude=1.6006907968450292):
     """
     存储数据的频繁模式
     :param init_path:数据路径
@@ -235,6 +249,7 @@ def get_data2():
     count = []
     for line in f.readlines():
         count.append(line.strip().split(":")[-1])
+    f.close()
     print(count)
 
 

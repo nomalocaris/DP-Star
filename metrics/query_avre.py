@@ -1,23 +1,26 @@
-# -*- encoding:utf-8 -*-
-import numpy as np
-import random
+"""
+-------------------------------------
+# -*- coding: utf-8 -*-
+# @Author  : HZT
+# @File    : query_avre.py
+# @Software: PyCharm
+-------------------------------------
+"""
+
 import os
-import datetime
+import random
 
 count_get = 0
-path_list = ['../../data/Geolife Trajectories 1.3/Trajectories7000/', '../../data/Geolife Trajectories '
-                                                                      '1.3/sd/sd_final_MDL1100_ep0.1/',
-             '../../data/Geolife '
-             'Trajectories '
-             '1.3/sd/sd_final_MDL1100_ep0.5/',
-             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep1.0/', '../../data/Geolife Trajectories '
-                                                                               '1.3/sd/sd_final_MDL1100_ep2.0/']
-path_test = ['../../data/Geolife Trajectories 1.3/Trajectories/', '../../data/Geolife Trajectories '
-                                                                  '1.3/test/0/', '../../data/Geolife '
-                                                                                 'Trajectories '
-                                                                                 '1.3/test/1/',
-             '../../data/Geolife Trajectories 1.3/test/2/', '../../data/Geolife Trajectories '
-                                                            '1.3/test/3/']
+path_list = ['../../data/Geolife Trajectories 1.3/Trajectories7000/',
+             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep0.1/',
+             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep0.5/',
+             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep1.0/',
+             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep2.0/']
+path_test = ['../../data/Geolife Trajectories 1.3/Trajectories/',
+             '../../data/Geolife Trajectories 1.3/test/0/',
+             '../../data/Geolife Trajectories 1.3/test/1/',
+             '../../data/Geolife Trajectories 1.3/test/2/',
+             '../../data/Geolife Trajectories 1.3/test/3/']
 
 
 # 参数：范围起点，范围终点，半径，查询数量，
@@ -41,6 +44,7 @@ def query(start_point, end_point, radius, D, SD):
         global count_get
         count_get += 1
     RE = abs(count_d - count_sd) / max(count_d, b)
+
     return RE
 
 
@@ -60,13 +64,12 @@ def get_data(init_path='../data/Geolife Trajectories 1.3/Trajectories/'):
             j = float(line.strip().split(',')[1].strip())
             T0.append((w, j))
         D.append(T0)
+        file_object.close()
+
     return D
 
 
-def get_QA(D, SD, min_latitude=39.6,
-           min_longitude=115.8,
-           len_latitude=1.2,
-           len_longitude=1.6):
+def get_QA(D, SD, min_latitude=39.6, min_longitude=115.8, len_latitude=1.2, len_longitude=1.6):
     """
     计算QA指标
     :param D:原始数据
@@ -80,8 +83,10 @@ def get_QA(D, SD, min_latitude=39.6,
 
     error_r = 0
     for it in range(10):  # 多次算均值
-        error_r += query((min_latitude, min_longitude), (min_latitude + len_latitude, min_longitude + len_longitude),
+        error_r += query((min_latitude, min_longitude),
+                         (min_latitude + len_latitude, min_longitude + len_longitude),
                          0.01, D, SD)
+
     return error_r / 10
 
 
