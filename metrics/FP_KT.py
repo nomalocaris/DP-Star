@@ -11,28 +11,20 @@ import os
 
 pattern = ['Frequent_Pattern_init.txt', 'Frequent_Pattern_sd.txt']
 path_list = ['../../data/Geolife Trajectories 1.3/Trajectories7000/',
-             '../../data/Geolife Trajectories '
-             '1.3/sd/sd_final_MDL1100_ep0.1/',
-             '../../data/Geolife '
-             'Trajectories '
-             '1.3/sd/sd_final_MDL1100_ep0.5/',
+             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep0.1/',
+             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep0.5/',
              '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep1.0/',
-             '../../data/Geolife Trajectories '
-             '1.3/sd/sd_final_MDL1100_ep2.0/']
+             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep2.0/']
 path_test = ['../../data/Geolife Trajectories 1.3/Trajectories7000/',
-             '../../data/Geolife Trajectories '
-             '1.3/test/0/', '../../data/Geolife '
-                            'Trajectories '
-                            '1.3/test/1/',
-             '../../data/Geolife Trajectories 1.3/test/2/', '../../data/Geolife Trajectories '
-                                                            '1.3/test/3/']
+             '../../data/Geolife Trajectories 1.3/test/0/',
+             '../../data/Geolife Trajectories 1.3/test/1/',
+             '../../data/Geolife Trajectories 1.3/test/2/',
+             '../../data/Geolife Trajectories 1.3/test/3/']
 
 
 def get_Frequent_Pattern(init_path='../../data/Geolife Trajectories 1.3/Trajectories/',
-                         min_latitude=39.6,
-                         min_longitude=115.8,
-                         len_latitude=1.2,
-                         len_longitude=1.6, para="init"):
+                         min_latitude=39.6, min_longitude=115.8,
+                         len_latitude=1.2, len_longitude=1.6, para="init"):
     """
     存储数据的频繁模式
     :param init_path:数据路径
@@ -176,10 +168,8 @@ def get_KT(init_dict, sd_dict):
 
 
 def get_check(init_path='../../data/Geolife Trajectories 1.3/Trajectories7000/',
-              min_latitude=39.6001216362634,
-              min_longitude=115.80024136052477,
-              len_latitude=1.2006028726893376,
-              len_longitude=1.6006907968450292):
+              min_latitude=39.6001216362634, min_longitude=115.80024136052477,
+              len_latitude=1.2006028726893376, len_longitude=1.6006907968450292):
     """
     存储数据的频繁模式
     :param init_path:数据路径
