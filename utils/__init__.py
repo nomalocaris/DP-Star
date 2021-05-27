@@ -1,14 +1,22 @@
-#!/usr/bin/env python
-# -*-coding:utf-8-*-
-# Author: nomalocaris <nomalocaris.top>
-""""""
-from __future__ import (absolute_import, unicode_literals)
-from ._progressbar import ProgressBar
-from _vector_cal import to_vec_add, to_vec_sub, to_vec_times, to_vec_dot
-from ._plot import plot_scatter, plot_traj
-import os
+"""
+-------------------------------------
+# -*- coding: utf-8 -*-
+# @Author  : nomalocaris、Giyn、HZT
+# @File    : __init__.py
+# @Software: PyCharm
+-------------------------------------
+"""
+
 import datetime
+import os
+
 import numpy as np
+
+from ._progressbar import ProgressBar
+from ._vector_cal import to_vec_add
+from ._vector_cal import to_vec_dot
+from ._vector_cal import to_vec_sub
+from ._vector_cal import to_vec_times
 
 
 def signum(x):
