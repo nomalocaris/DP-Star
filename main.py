@@ -1,14 +1,21 @@
-#!/usr/bin/env python
-# -*-coding:utf-8-*-
-# Author: nomalocaris <nomalocaris.top>
-""""""
-from __future__ import (absolute_import, unicode_literals)
-from dpstar import generate_adaptive_grid, read_mdl_data
+"""
+-------------------------------------
+# -*- coding: utf-8 -*-
+# @Author  :
+             nomalocaris
+             Giyn
+# @File    : FP_KT.py
+# @Software: PyCharm
+-------------------------------------
+"""
+
+from dpstar import generate_adaptive_grid
 from dpstar import generate_sd_grid_mapping_traj
 from dpstar import trip_distribution_main
 from dpstar import mobility_model_main
 from dpstar import route_length_estimate_main
-from dpstar import syn
+from dpstar import synthetic_trajs
+from dpstar import read_mdl_data
 
 from joblib import Parallel, delayed
 from config import *
@@ -26,54 +33,72 @@ epsilon_alloc = {
     'mle': (2/9)  # route length estimation(a median length estimation method)
 }
 
+mdl_trajs_dir = 'data/QG Taxi/MDL/'
+# the ada grid construction
+top_grid_path = 'data/QG Taxi/Middleware/top_grid_epsilon_{}.txt'
+# the grid trajectories
+grid_trajs_path = 'data/QG Taxi/Middleware/grid_trajs_epsilon_{}.txt'
+# the top grid range
+grid_block_gps_range_path = 'data/QG Taxi/Middleware/grid_block_gps_range_epsilon_{}.txt'
+trip_distribution_path = 'data/QG Taxi/Middleware/trip_distribution_epsilon_{}.txt'
+midpoint_movement_path = 'data/QG Taxi/Middleware/midpoint_movement_epsilon_{}.txt'
+length_traj_path = 'data/QG Taxi/Middleware/routes_length_epsilon_{}.txt'
+# grid sd trajectories
+sd_path = 'data/QG Taxi/Middleware/sd_epsilon_{}'
+# ture sd trajectories dir
+sd_final_path = 'data/QG Taxi/SD/sd_final_epsilon_{}'
+
 
 def run(epsilon):
     # generate adaptive grid
     n_grid = generate_adaptive_grid(
-        idir_traj=mdl_trajectories_input_dir,
-        opath_top_grid=top_grid_path,
-        opath_grid_traj=grid_traj_path,
-        opath_grid_block_gps_range=omega_path,
+        mdl_trajs_dir=mdl_trajs_dir,
+        top_grid_path=top_grid_path.format(epsilon),
+        grid_trajs_path=grid_trajs_path.format(epsilon),
+        grid_block_gps_range_path=grid_block_gps_range_path.format(epsilon),
         n_top_grid=n_top_grid,
         epsilon_alloc=epsilon_alloc['ag'] * epsilon,
-        epsilon_tot=epsilon,
+        epsilon_total=epsilon,
         gps_range=gps_range,
         beta_factor=beta_factor
     )
 
-    trip_distribution_main(n_grid, epsilon=epsilon_alloc['td'] * epsilon,
-                           src_file=grid_traj_path, out_file=trip_distribution_path)
+    trip_distribution_main(n_grid, _epsilon=epsilon_alloc['td'] * epsilon,
+                           grid_trajs_path=grid_trajs_path.format(epsilon),
+                           trip_distribution_path=trip_distribution_path.format(epsilon))
 
-    mobility_model_main(n_grid, epsilon=epsilon_alloc['markov'] * epsilon,
-                        src_file=grid_traj_path, out_file=midpoint_movement_path)
+    mobility_model_main(n_grid, _epsilon=epsilon_alloc['markov'] * epsilon,
+                        grid_trajs_path=grid_trajs_path.format(epsilon),
+                        midpoint_movement_path=midpoint_movement_path.format(epsilon))
 
-    maxT = route_length_estimate_main(n_grid, epsilon=epsilon_alloc['mle'] * epsilon,
-                                      src_file=grid_traj_path, out_file=length_traj_path)
+    maxT = route_length_estimate_main(n_grid, _epsilon=epsilon_alloc['mle'] * epsilon,
+                                      grid_trajs_path=grid_trajs_path.format(epsilon),
+                                      routes_length_path=length_traj_path.format(epsilon))
 
-    syn(n_grid, maxT, trip_distribution_path, midpoint_movement_path, length_traj_path, sd_path, 14650)
+    synthetic_trajs(n_grid, maxT, trip_distribution_path.format(epsilon),
+                    midpoint_movement_path.format(epsilon), length_traj_path.format(epsilon),
+                    sd_path.format(epsilon), 2801)
 
     # generate sd trajectory
     generate_sd_grid_mapping_traj(
-        ipath_sd=sd_path,
-        n_top_grid=n_top_grid,
-        ipath_top_grid=top_grid_path,
-        ipath_grid_block_gps_range=omega_path,
-        odir_sd=sd_final_path,
-        mapping_rate=1100,
-        mapping_bais={'lat': 39.6, 'lon': 115.8}
+        sd_path=sd_path.format(epsilon),
+        grid_block_gps_range_path=grid_block_gps_range_path.format(epsilon),
+        sd_desensitize_path=sd_final_path.format(epsilon),
+        mapping_rate=1200,
+        mapping_bias={'lat': 22.8, 'lon': 112.7}
     )
 
 
 if __name__ == '__main__':
     Parallel(n_jobs=4)(delayed(run)(i) for i in epsilon_list)
 
-# tot_traj = read_mdl_data(idir_mdl_traj)
-# tot_points = []
-# for traj in tot_traj:
-#     tot_points += traj
-# tot_points = np.array(tot_points)
-# print(tot_points.min(axis=0))
-# print(tot_points.max(axis=0))
+    # tot_traj = read_mdl_data(mdl_trajectories_input_dir)
+    # tot_points = []
+    # for traj in tot_traj:
+    #     tot_points += traj
+    # tot_points = np.array(tot_points)
+    # print(tot_points.min(axis=0))
+    # print(tot_points.max(axis=0))
 
 # tot_traj = read_mdl_data(idir_mdl_traj)
 # plt.figure(figsize=(6, 5))
