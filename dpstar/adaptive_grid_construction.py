@@ -1,10 +1,7 @@
 """
 -------------------------------------
 # -*- coding: utf-8 -*-
-# @Author  :
-             nomalocaris
-             Giyn
-             HZT
+# @Author  : nomalocaris、Giyn、HZT
 # @File    : adaptive_grid_construction.py
 # @Software: PyCharm
 -------------------------------------

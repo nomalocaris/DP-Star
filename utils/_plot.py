@@ -1,12 +1,16 @@
-#!/usr/bin/env python
-# -*-coding:utf-8-*-
-# Author: nomalocaris <nomalocaris.top>
 """
-    the functions for plot.
+-------------------------------------
+# -*- coding: utf-8 -*-
+# @Author  : nomalocaris
+# @File    : _plot.py
+# @Software: PyCharm
+-------------------------------------
 """
-from __future__ import (absolute_import, unicode_literals)
-import numpy as np
+import os
+
 import matplotlib.pyplot as plt
+import numpy as np
+
 from utils import ProgressBar
 
 
@@ -20,8 +24,7 @@ def plot_scatter(points, fig_size=(6, 6), color='mediumpurple', size=5, title=''
 
 
 def plot_traj(trajs, fig_size=(6, 6), color="mediumpurple", size=5,
-              title='',
-              is_plot_line=False, od_only=False, offset=None):
+              title='', is_plot_line=False, od_only=False, offset=None):
     """plot the traj
     """
     if offset is None:
@@ -48,3 +51,15 @@ def plot_traj(trajs, fig_size=(6, 6), color="mediumpurple", size=5,
             plt.scatter(x, y, c=color, s=size)
     plt.title(title)
     plt.show()
+
+
+if __name__ == '__main__':
+    file_list = os.listdir('../data/QG Taxi/Trajectories/')
+    print(file_list)
+    point_list = []
+    for file in file_list:
+        with open('../data/QG Taxi/Trajectories/' + file, 'r', encoding='utf-8') as traj_file:
+            for i in traj_file.readlines():
+                point_list.append(list(map(lambda x: float(x.strip()), i.split(','))))
+
+    plot_scatter(point_list)

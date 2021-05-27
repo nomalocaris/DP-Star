@@ -1,8 +1,11 @@
-#!/usr/bin/env python
-# -*-coding:utf-8-*-
-# Author: nomalocaris <nomalocaris.top>
-""""""
-from __future__ import (absolute_import, unicode_literals)
+"""
+-------------------------------------
+# -*- coding: utf-8 -*-
+# @Author  : nomalocaris
+# @File    : _vector_cal.py
+# @Software: PyCharm
+-------------------------------------
+"""
 
 
 def to_vec_sub(p1, p2):

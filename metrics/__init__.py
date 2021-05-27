@@ -1,6 +1,11 @@
-#!/usr/bin/env python
-# -*-coding:utf-8-*-
-# Author: nomalocaris <nomalocaris.top>
-""""""
-from __future__ import (absolute_import, unicode_literals)
-from .DiameterE import SD_len, D_len, cal_diameter_e
+"""
+-------------------------------------
+# -*- coding: utf-8 -*-
+# @Author  : nomalocaris、Giyn、HZT
+# @File    : __init__.py
+# @Software: PyCharm
+-------------------------------------
+"""
+
+from .diameter_error import D_len
+from .diameter_error import cal_diameter_e

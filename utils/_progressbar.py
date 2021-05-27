@@ -1,10 +1,12 @@
-#!/usr/bin/env python
-# -*-coding:utf-8-*-
-# Author: nomalocaris <nomalocaris.top>
 """
-    progress bar module
+-------------------------------------
+# -*- coding: utf-8 -*-
+# @Author  : nomalocaris
+# @File    : extract_data.py
+# @Software: PyCharm
+-------------------------------------
 """
-from __future__ import (absolute_import, unicode_literals)
+
 import time
 
 
@@ -82,5 +84,3 @@ if __name__ == '__main__':
     for i in range(200):
         time.sleep(0.1)
         p1.update(i)
-
-

@@ -1,10 +1,7 @@
 """
 -------------------------------------
 # -*- coding: utf-8 -*-
-# @Author  :
-             nomalocaris
-             Giyn
-             HZT
+# @Author  : HZT
 # @File    : diameter_error.py
 # @Software: PyCharm
 -------------------------------------
@@ -14,6 +11,7 @@ import os
 from math import log
 
 import numpy as np
+
 from utils import ProgressBar
 
 
@@ -93,6 +91,7 @@ def _cal_diameter_e(D_maxlen, D_maxlen_arr, SD_maxlen, SD_maxlen_arr):
     ep_SD /= np.sum(ep_SD)
     ep_SD = ep_SD.tolist()
     dia_e = JSD_core(ep_D, ep_SD)
+
     return dia_e
 
 
@@ -103,6 +102,7 @@ def cal_diameter_e(d_path, sd_path):
     with open("dm_arr.txt", "r") as output:
         dm_arr = eval(output.read())
     sdm, sdm_arr = D_len(sd_path)
+
     return _cal_diameter_e(dm, dm_arr, sdm, sdm_arr)
 
 
@@ -115,22 +115,10 @@ def count_d_path(d_path):
 
 
 if __name__ == '__main__':
-    # print(cal_diameter_e("../../data/Geolife Trajectories 1.3/Trajectories/", "../../data/Geolife Trajectories "
-    #                                                                     "1.3/sd/sd_final_MDL1100_ep0.1/"))
-    # print(cal_diameter_e("../../data/Geolife Trajectories 1.3/Trajectories/", "../../data/Geolife Trajectories "
-    #                                                                           "1.3/sd/sd_final_MDL1100_ep0.5/"))
-    # print(cal_diameter_e("../../data/Geolife Trajectories 1.3/Trajectories/", "../../data/Geolife Trajectories "
-    #                                                                           "1.3/sd/sd_final_MDL1100_ep1.0/"))
-    # print(cal_diameter_e("../../data/Geolife Trajectories 1.3/Trajectories/", "../../data/Geolife Trajectories "
-    #                                                                           "1.3/sd/sd_final_MDL1100_ep2.0/"))
-    # print(cal_diameter_e("../../data/Geolife Trajectories 1.3/Trajectories/", "../../data/Geolife Trajectories "
-    #                                                                     "1.3/test/0/"))
-    # print(cal_diameter_e("../../data/Geolife Trajectories 1.3/Trajectories/", "../../data/Geolife Trajectories "
-    #                                                                           "1.3/test/1/"))
-    print(cal_diameter_e("../../data/Geolife Trajectories 1.3/Trajectories/", "../../data/Geolife Trajectories "
-                                                                              "1.3/test/2/"))
-    print(cal_diameter_e("../../data/Geolife Trajectories 1.3/Trajectories/", "../../data/Geolife Trajectories "
-                                                                              "1.3/test/3/"))
+    print(cal_diameter_e("../../data/Geolife Trajectories 1.3/Trajectories/",
+                         "../../data/Geolife Trajectories 1.3/test/2/"))
+    print(cal_diameter_e("../../data/Geolife Trajectories 1.3/Trajectories/",
+                         "../../data/Geolife Trajectories 1.3/test/3/"))
     # count_d_path("../../data/Geolife Trajectories 1.3/Trajectories7000/")
     # with open("dm_arr.txt", "r") as output:
     #     print(eval(output.read()))
