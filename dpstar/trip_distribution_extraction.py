@@ -71,7 +71,7 @@ def trip_distribution_main(n_grid: int, _epsilon: float, grid_trajs_path: str,
         # 网格轨迹数据(list)
         T = [eval(grid_traj) for grid_traj in grid_trajs_file.readlines()]
         with open(trip_distribution_path, 'w') as trip_distribution_file:
-            trip_distribution_matrix = trip_distribution(T, n_grid, epsilon)
+            trip_distribution_matrix = trip_distribution(T, n_grid, _epsilon)
             for item in trip_distribution_matrix:
                 each_line = ' '.join([str(i) for i in item]) + '\n'
                 trip_distribution_file.writelines(each_line)
