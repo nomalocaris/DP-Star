@@ -1,84 +1,44 @@
 """
 -------------------------------------
 # -*- coding: utf-8 -*-
-# @Author  : HZT
+# @Author  : QG
 # @File    : diameter_error.py
 # @Software: PyCharm
 -------------------------------------
 """
 
-import os
-from math import log
+from joblib import Parallel
+from joblib import delayed
 
-import numpy as np
-
-from utils import ProgressBar
-
-
-def KLD(p, q):     # 计算KL散度
-    p += np.spacing(1)
-    q += np.spacing(1)
-
-    return sum([_p * log(_p/_q) for (_p, _q) in zip(p, q)])
+from config import *
+from metrics import *
 
 
-def JSD_core(p, q):  # 计算JS散度（Jensen–Shannon divergence）
-    M = [0.5 * (_p + _q) for _p, _q in zip(p, q)]
+def _cal_diameter_error(d_max_len, d_max_len_arr, sd_max_len, sd_max_len_arr):
+    """
 
-    return 0.5 * KLD(p, M) + 0.5 * KLD(q, M)
+    calculate diameter error(DE)
 
+    Args:
+        d_max_len     :
+        d_max_len_arr :
+        sd_max_len    :
+        sd_max_len_arr:
 
-def D_len(d_path):
-    D = []
-    path_all = []
-    base_path_list = os.listdir(d_path)
-    for path in base_path_list:
-        file_object = open(d_path + path, 'r')
-        T0 = []
-        path_all.append(path)
-        for line in file_object.readlines():
-            jw = line.strip().split(',')
-            w = jw[0]
-            w = float(w)
-            j = jw[1].strip()
-            j = float(j)
-            T0.append((w, j))
-        D.append(T0)
-    D_maxlen_arr = []
-    D_maxlen = 0
-    d_len = len(D)
-    p = ProgressBar(d_len, '计算D轨迹长度')
-    for i in range(d_len):  # 多条轨迹
-        p.update(i)
-        T0 = D[i]
-        T_maxlen = 0
-        for i in range(len(T0)):
-            for j in range(i, len(T0)):
-                if i==j:
-                    continue
-                else:
-                    now_len = ((T0[i][0] - T0[j][0])**2 + (T0[i][1] - T0[j][1])**2)**0.5
-                    if now_len > D_maxlen:
-                        D_maxlen = now_len
-                    if now_len > T_maxlen:
-                        T_maxlen = now_len
-        D_maxlen_arr.append(T_maxlen)
-    return D_maxlen, D_maxlen_arr
+    Returns:
 
-
-def _cal_diameter_e(D_maxlen, D_maxlen_arr, SD_maxlen, SD_maxlen_arr):
-    # 存入epsilon数组
+    """
     ep_D = [0 for _ in range(20)]
     ep_SD = [0 for _ in range(20)]
-    for item in D_maxlen_arr:
-        num = int(item/(D_maxlen/20))
+    for item in d_max_len_arr:
+        num = int(item / (d_max_len / 20))
         if num < 20:
             ep_D[num] += 1
         else:
             ep_D[19] += 1
 
-    for item in SD_maxlen_arr:
-        num = int(item/(SD_maxlen/20))
+    for item in sd_max_len_arr:
+        num = int(item / (sd_max_len / 20))
         if num < 20:
             ep_SD[num] += 1
         else:
@@ -90,35 +50,60 @@ def _cal_diameter_e(D_maxlen, D_maxlen_arr, SD_maxlen, SD_maxlen_arr):
     ep_SD = np.array(ep_SD, dtype='float32')
     ep_SD /= np.sum(ep_SD)
     ep_SD = ep_SD.tolist()
-    dia_e = JSD_core(ep_D, ep_SD)
+    diameter_error = jsd(ep_D, ep_SD)
 
-    return dia_e
+    return diameter_error
 
 
-def cal_diameter_e(d_path, sd_path):
-    """"""
-    # dm, dm_arr = D_len(d_path)
-    dm = 1.4979605451980367
-    with open("dm_arr.txt", "r") as output:
-        dm_arr = eval(output.read())
-    sdm, sdm_arr = D_len(sd_path)
+def cal_diameter_error(d_path, sd_path):
+    """
 
-    return _cal_diameter_e(dm, dm_arr, sdm, sdm_arr)
+    calculate diameter error(DE) (main function)
+
+    Args:
+        d_path :
+        sd_path:
+
+    Returns:
+
+    """
+    diameter, diameter_array = d_len(d_path)
+
+    if not os.path.exists(USE_DATA):
+        os.mkdir(USE_DATA)
+
+    with open(f"{USE_DATA}/diameter_array.txt", "r") as output:
+        diameter_array = eval(output.read())
+    s_diameter, s_diameter_array = d_len(sd_path)
+
+    diameter_error_ = _cal_diameter_error(diameter, diameter_array, s_diameter, s_diameter_array)
+
+    print('Diameter Error: ', sd_path, diameter_error_)
+
+    return diameter_error_
 
 
 def count_d_path(d_path):
-    dm, dm_arr = D_len(d_path)
-    print("dm:", dm)
-    with open("dm_arr.txt", "w") as output:
-        output.write(str(dm_arr))
-    print(dm_arr)
+    """
+
+    calculate trajectory path
+
+    Args:
+        d_path :
+
+    Returns:
+
+    """
+    diameter_array = d_len(d_path)[1]
+
+    if not os.path.exists(USE_DATA):
+        os.mkdir(USE_DATA)
+    with open(f"{USE_DATA}/diameter_array.txt", "w") as output:
+        output.write(str(diameter_array))
 
 
 if __name__ == '__main__':
-    print(cal_diameter_e("../../data/Geolife Trajectories 1.3/Trajectories/",
-                         "../../data/Geolife Trajectories 1.3/test/2/"))
-    print(cal_diameter_e("../../data/Geolife Trajectories 1.3/Trajectories/",
-                         "../../data/Geolife Trajectories 1.3/test/3/"))
-    # count_d_path("../../data/Geolife Trajectories 1.3/Trajectories7000/")
-    # with open("dm_arr.txt", "r") as output:
-    #     print(eval(output.read()))
+    count_d_path(f"../data/{USE_DATA}/Trajectories/")
+    Parallel(n_jobs=4)(delayed(cal_diameter_error)(f"../data/{USE_DATA}/Trajectories/",
+                                                   f"../data/{USE_DATA}/SD/sd_final_epsilon_{i}/"
+                                                   ) for i in epsilon_list)

@@ -17,31 +17,31 @@ from utils import ProgressBar
 def trip_distribution(trajs: list, n_grid: int, _epsilon: float) -> np.ndarray:
     """
 
-    获取转移概率矩阵
+    get the transition probability matrix
 
     Args:
-        trajs  : 轨迹数据(二维数组)
-        n_grid : 二级网格数
-        _epsilon: 隐私预算
+        trajs   : trajectory data(two dimensional array)
+        n_grid  : number of secondary grids
+        _epsilon: privacy budget
 
     Returns:
-        R: 转移概率矩阵
+        R: transition probability matrix
 
     """
-    R = np.zeros((n_grid, n_grid))  # 建立 n_grid * n_grid 的转移概率矩阵
+    R = np.zeros((n_grid, n_grid))  # establish n_grid * n_grid transition probability matrix
     for t in trajs:
         if len(t) > 1:
             sta = t[0]
             end = t[-1]
             R[sta][end] += 1
 
-    count = int(np.sum(R))  # 轨迹条数
+    count = int(np.sum(R))  # number of tracks
 
-    p = ProgressBar(n_grid, '生成转移概率矩阵')
+    p = ProgressBar(n_grid, 'Generate transition probability matrix')
     for i in range(n_grid):
         p.update(i)
         for j in range(n_grid):
-            noise = np.random.laplace(0, 1 / _epsilon)  # 添加拉普拉斯噪声
+            noise = np.random.laplace(0, 1 / _epsilon)  # add laplacian noise
             R[i][j] += noise
 
             if R[i][j] < 0:
@@ -56,19 +56,18 @@ def trip_distribution_main(n_grid: int, _epsilon: float, grid_trajs_path: str,
                            trip_distribution_path: str):
     """
 
-    主函数(将转移概率矩阵写入文件)
+    trip distribution (main function)
 
     Args:
-        n_grid                : 网格数
-        _epsilon              : 隐私预算
-        grid_trajs_path       : 网格轨迹文件路径
-        trip_distribution_path: 转移概率矩阵输出文件路径
+        n_grid                : number of grids
+        _epsilon              : privacy budget
+        grid_trajs_path       : grid trajectory file path
+        trip_distribution_path: transition probability matrix output file path
 
     Returns:
 
     """
     with open(grid_trajs_path, 'r') as grid_trajs_file:
-        # 网格轨迹数据(list)
         T = [eval(grid_traj) for grid_traj in grid_trajs_file.readlines()]
         with open(trip_distribution_path, 'w') as trip_distribution_file:
             trip_distribution_matrix = trip_distribution(T, n_grid, _epsilon)

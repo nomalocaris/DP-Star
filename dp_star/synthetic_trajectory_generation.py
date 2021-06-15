@@ -97,7 +97,8 @@ def synthetic_trajs(n_grid: int, max_t_len: int, trip_distribution_path: str,
                 if np.sum(sample_prob) == 0:
                     continue
                 sample_prob /= np.sum(sample_prob)  # 归一化
-                now_point = np.random.choice([int(m) for m in range(n_grid)], p=sample_prob.ravel())  # 抽样
+                now_point = np.random.choice([int(m) for m in range(n_grid)],
+                                             p=sample_prob.ravel())  # 抽样
                 prev_point = now_point  # 更新上一个点
                 T.append(now_point)  # 加入轨迹中
 
@@ -111,8 +112,8 @@ def synthetic_trajs(n_grid: int, max_t_len: int, trip_distribution_path: str,
 if __name__ == '__main__':
     epsilon = 0.1
     synthetic_trajs(64, 235,
-                    f'../data/Geolife Trajectories 1.3/middleware/trip_distribution_epsilon_{epsilon}.txt',
-                    f'../data/Geolife Trajectories 1.3/middleware/midpoint_movement_epsilon_{epsilon}.txt',
-                    f'../data/Geolife Trajectories 1.3/middleware/routes_length_epsilon_{epsilon}.txt',
-                    f'../data/Geolife Trajectories 1.3/middleware/sd_epsilon_{epsilon}.txt',
+                    f'../data/Geolife Trajectories 1.3/Middleware/trip_distribution_epsilon_{epsilon}.txt',
+                    f'../data/Geolife Trajectories 1.3/Middleware/midpoint_movement_epsilon_{epsilon}.txt',
+                    f'../data/Geolife Trajectories 1.3/Middleware/routes_length_epsilon_{epsilon}.txt',
+                    f'../data/Geolife Trajectories 1.3/SD/sd_epsilon_{epsilon}.txt',
                     14650)

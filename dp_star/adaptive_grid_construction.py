@@ -7,11 +7,9 @@
 -------------------------------------
 """
 
-import os
-
 import matplotlib.pyplot as plt
 import numpy as np
-
+from config import *
 import utils
 
 
@@ -313,7 +311,7 @@ def cal_split(x_range, y_range, n_split):
     return split_lines
 
 
-def generate_sd_grid_mapping_traj(sd_path, grid_block_gps_range_path, sd_desensitize_path,
+def generate_sd_grid_mapping_traj(sd_path, grid_block_gps_range_path, sd_final_path,
                                   mapping_rate=1, mapping_bias=None):
     """
 
@@ -322,7 +320,7 @@ def generate_sd_grid_mapping_traj(sd_path, grid_block_gps_range_path, sd_desensi
     Args:
         sd_path                  : input
         grid_block_gps_range_path: input
-        sd_desensitize_path      : output
+        sd_final_path            : output
         mapping_rate             :
         mapping_bias             :
 
@@ -353,7 +351,6 @@ def generate_sd_grid_mapping_traj(sd_path, grid_block_gps_range_path, sd_desensi
     if mapping_bias is None:
         mapping_bias = {'lat': 0, 'lon': 0}
 
-    # privacy budget
     with open(sd_path) as sd_file:
         sd = [eval(point) for point in sd_file.readlines()]
 
@@ -370,13 +367,19 @@ def generate_sd_grid_mapping_traj(sd_path, grid_block_gps_range_path, sd_desensi
     for traj in sd:
         reverse_mapped_trajs.append([random_sampling(grid_block_gps_range[i]) for i in traj])
 
+    if not os.path.exists(sd_final_path):
+        os.mkdir(sd_final_path)
     # write to files
     fcount = 0
     p = utils.ProgressBar(len(reverse_mapped_trajs), '生成脱敏数据集')
-    for i in range(len(reverse_mapped_trajs)):
+
+    with open(f'data/{USE_DATA}/trajs_file_name_list.pkl', 'rb') as trajs_file_name_list_file:
+        trajs_file_name_list = pickle.loads(trajs_file_name_list_file.read())
+
+    for i in range(len(trajs_file_name_list)):
         p.update(i)
 
-        with open(sd_desensitize_path + '/sd_traj' + str(fcount) + '.txt', 'w') as fw_traj:
+        with open(sd_final_path + f'/{trajs_file_name_list[i]}.txt', 'w') as fw_traj:
             for point in reverse_mapped_trajs[i]:
                 # mapping
                 point = [point[0] / mapping_rate + mapping_bias['lat'],

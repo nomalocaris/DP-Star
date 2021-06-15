@@ -1,267 +1,213 @@
 """
 -------------------------------------
 # -*- coding: utf-8 -*-
-# @Author  : HZT
+# @Author  : QG
 # @File    : FP_KT.py
 # @Software: PyCharm
 -------------------------------------
 """
 
 import os
+import pickle
 
-pattern = ['Frequent_Pattern_init.txt', 'Frequent_Pattern_sd.txt']
-path_list = ['../../data/Geolife Trajectories 1.3/Trajectories7000/',
-             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep0.1/',
-             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep0.5/',
-             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep1.0/',
-             '../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep2.0/']
-path_test = ['../../data/Geolife Trajectories 1.3/Trajectories7000/',
-             '../../data/Geolife Trajectories 1.3/test/0/',
-             '../../data/Geolife Trajectories 1.3/test/1/',
-             '../../data/Geolife Trajectories 1.3/test/2/',
-             '../../data/Geolife Trajectories 1.3/test/3/']
+from joblib import Parallel
+from joblib import delayed
+
+from config import *
+
+frequent_pattern_list = ['{}/frequent_pattern_raw.txt',
+                         '{}/frequent_pattern_sd_{}.txt']
 
 
-def get_Frequent_Pattern(init_path='../../data/Geolife Trajectories 1.3/Trajectories/',
-                         min_latitude=39.6, min_longitude=115.8,
-                         len_latitude=1.2, len_longitude=1.6, para="init"):
-    """
-    存储数据的频繁模式
-    :param init_path:数据路径
-    :param min_latitude:最小纬度
-    :param min_longitude:最小经度
-    :param len_latitude:纬度差值
-    :param len_longitude:经度差值
-    :param para:计算频繁模式,选择数据集
-    :return:排序好的频繁模式集
+def save_frequent_pattern(trajs_path: str, min_latitude: float, min_longitude: float,
+                          len_latitude: float, len_longitude: float, traj_type: str,
+                          epsilon: float):
     """
 
-    lat_accu = len_latitude / 6  # 维度边的跨度
-    lon_accu = len_longitude / 6  # 经度边的跨度
+    frequent patterns of stored data
 
-    # 存频繁模式
-    Frequent_Pattern = {}
+    Args:
+        trajs_path   : track file path
+        min_latitude : minimum latitude(GPS)
+        min_longitude: minimum longitude(GPS)
+        len_latitude : latitude range(GPS)
+        len_longitude: longitude range(GPS)
+        traj_type    : choose a data set
+        epsilon      : privacy budget
 
-    base_path_list = os.listdir(init_path)
-    for path in base_path_list:
-        file_object = open(init_path + path, 'r')  # 读取轨迹数据文件
-        T0 = []
+    Returns:
+        sorted frequent pattern set
 
-        for line in file_object.readlines():
-            w = float(line.strip().split(',')[0].strip())
-            w = int((w - min_latitude) / lat_accu)  # 维度对应网格的位置
-            j = float(line.strip().split(',')[1].strip())
-            j = int((j - min_longitude) / lon_accu)  # 经度对应网格的位置
+    """
+    grid_side = 6
+    if not os.path.exists(USE_DATA):
+        os.mkdir(USE_DATA)
 
-            if len(T0) > 0 and w * 6 + j == T0[-1]:  # 排除连续出现在一个格子里面的情况
-                continue
-            if w * 6 + j in T0:
-                continue
-            T0.append(w * 6 + j)  # 格子的编号
-        P = tuple(T0.copy())
-        if 3 <= len(P):
-            if P in Frequent_Pattern.keys():
-                Frequent_Pattern[P] += 1
+    each_lat = len_latitude / grid_side  # the span of the latitude side
+    each_lon = len_longitude / grid_side  # the span of the longitude side
+
+    frequent_pattern = {}  # frequent patterns
+
+    trajs_file_list = os.listdir(trajs_path)
+    for file in trajs_file_list:
+        with open(trajs_path + file, 'r') as traj_file:
+            grid_num_list = []
+            for line in traj_file.readlines():
+                point = list(map(float, line.split(',')))
+                # latitude corresponds to the position of the grid
+                lat_to_grid = int((point[0] - min_latitude) / each_lat)
+                # longitude corresponds to the position of the grid
+                lon_to_grid = int((point[1] - min_longitude) / each_lon)
+
+                # exclude continuous occurrence in one grid
+                if len(grid_num_list) > 0 and lat_to_grid * grid_side + lon_to_grid == grid_num_list[-1]:
+                    continue
+                if lat_to_grid * grid_side + lon_to_grid in grid_num_list:
+                    continue
+
+                grid_num_list.append(lat_to_grid * grid_side + lon_to_grid)  # number of the grid
+
+        P = tuple(grid_num_list.copy())
+        if len(P) >= 3:
+            if P in frequent_pattern.keys():
+                frequent_pattern[P] += 1
             else:
-                Frequent_Pattern[P] = 1
-    if para == "init":
-        f = open(pattern[0], 'w')
+                frequent_pattern[P] = 1
+
+    if traj_type == "raw":
+        with open(frequent_pattern_list[0].format(USE_DATA), 'w') as file:
+            for record in frequent_pattern.keys():
+                file.writelines(str(record) + ':' + str(frequent_pattern[record]) + '\n')
     else:
-        f = open(pattern[1], 'w')
+        with open(frequent_pattern_list[1].format(USE_DATA, epsilon), 'w') as file:
+            for record in frequent_pattern.keys():
+                file.writelines(str(record) + ':' + str(frequent_pattern[record]) + '\n')
 
-    for record in Frequent_Pattern.keys():
-        f.writelines(str(record) + ':' + str(Frequent_Pattern[record]) + '\n')
-    f.close()
-    return sorted(Frequent_Pattern.items(), key=lambda x: x[1], reverse=True)
+    return sorted(frequent_pattern.items(), key=lambda x: x[1], reverse=True)
 
 
-def get_Fredata(para="init"):
+def get_frequent_pattern(traj_type: str, epsilon: float) -> dict:
     """
-    获取频繁模式数据
-    :param para:计算频繁模式,选择数据集
-    :return:
+
+    get frequent pattern data
+
+    Args:
+        traj_type: choose a data set
+        epsilon  : privacy budget
+
+    Returns:
+        dict_: sorted frequent pattern set
+
     """
-    if para == "init":
-        f = open(pattern[0], 'r')
+    frequent_pattern = {}
+    if traj_type == "raw":
+        with open(frequent_pattern_list[0].format(USE_DATA), 'r') as file:
+            for line in file.readlines():
+                frequent_pattern[tuple((line.split(':')[0].strip()[1:-1]).split(','))] = \
+                    int(line.split(':')[1].strip())
     else:
-        f = open(pattern[1], 'r')
+        with open(frequent_pattern_list[1].format(USE_DATA, epsilon), 'r') as file:
+            for line in file.readlines():
+                frequent_pattern[tuple((line.split(':')[0].strip()[1:-1]).split(','))] = \
+                    int(line.split(':')[1].strip())
 
-    Fre_dict = {}
-    for line in f.readlines():
-        Fre_dict[tuple((line.split(':')[0].strip()[1:-1]).split(','))] = int(
-            line.split(':')[1].strip())
     dict_ = {}
-    for item in sorted(Fre_dict.items(), key=lambda x: x[1], reverse=True):
+    for item in sorted(frequent_pattern.items(), key=lambda x: x[1], reverse=True):
         dict_[item[0]] = item[1]
+
     return dict_
 
 
-def get_FP(init_dict, sd_dict):
+def cal_fps(raw_trajs_frequent_pattern: dict, sd_trajs_frequent_pattern: dict) -> float:
     """
-    计算FP指标
-    :param init_dict:原始数据的频繁模式字典
-    :param sd_dict:生成数据的频繁模式字典
-    :return:FP指标
+
+    calculate FPS
+
+    Args:
+        raw_trajs_frequent_pattern: frequent patterns of the original trajectory
+        sd_trajs_frequent_pattern : frequent patterns that generate trajectories
+
+    Returns:
+        FPS
+
     """
     FP = 0
 
-    for p in list(init_dict.keys())[:50]:
-        if p in sd_dict.keys():
-            re = abs(init_dict[p] - sd_dict[p]) / init_dict[p]
+    for p in list(raw_trajs_frequent_pattern.keys())[:50]:
+        if p in sd_trajs_frequent_pattern.keys():
+            re = abs(raw_trajs_frequent_pattern[p] - sd_trajs_frequent_pattern[p]) / raw_trajs_frequent_pattern[p]
             FP += re
+
     return FP / 50
 
 
-def extra_same_elem(list1, list2):
-    set1 = set(list1)
-    set2 = set(list2)
-    iset = set1.intersection(set2)
-    return list(iset)
-
-
-def get_KT(init_dict, sd_dict):
+def cal_kt(raw_trajs_frequent_pattern, sd_trajs_frequent_pattern):
     """
-    计算KT指标
-    :param init_dict:原始数据的频繁模式字典
-    :param sd_dict:生成数据的频繁模式字典
-    :return:KT指标
+
+    calculate KT
+
+    Args:
+        raw_trajs_frequent_pattern: frequent patterns of the original trajectory
+        sd_trajs_frequent_pattern : frequent patterns that generate trajectories
+
+    Returns:
+        KT
+
     """
-    concor_count = 0
-    discor_count = 0
+    concordant_count = 0
+    discordant_count = 0
     k = 0
 
-    # 取前50各的方法
-    for i in range(len(list(init_dict.keys()))):
+    for i in range(len(list(raw_trajs_frequent_pattern.keys()))):
         if k >= 50:
             break
-        if list(init_dict.keys())[i] in sd_dict.keys():
+        if list(raw_trajs_frequent_pattern.keys())[i] in sd_trajs_frequent_pattern.keys():
             k += 1
 
-    for i in range(len(list(init_dict.keys())[:k])):
-        if list(init_dict.keys())[i] in sd_dict.keys():
-            for j in range(i + 1, len(list(init_dict.keys())[:k])):
-                if list(init_dict.keys())[j] in sd_dict.keys():
-                    if (init_dict[list(init_dict.keys())[i]] >= init_dict[
-                        list(init_dict.keys())[j]] and sd_dict[
-                            list(init_dict.keys())[i]] > sd_dict[list(init_dict.keys())[j]]) or \
-                            (init_dict[list(init_dict.keys())[i]] < init_dict[
-                                list(init_dict.keys())[j]] and sd_dict[
-                                 list(init_dict.keys())[i]] < sd_dict[list(init_dict.keys())[j]]):
-                        concor_count += 1
+    for i in range(len(list(raw_trajs_frequent_pattern.keys())[:k])):
+        if list(raw_trajs_frequent_pattern.keys())[i] in sd_trajs_frequent_pattern.keys():
+            for j in range(i + 1, len(list(raw_trajs_frequent_pattern.keys())[:k])):
+                if list(raw_trajs_frequent_pattern.keys())[j] in sd_trajs_frequent_pattern.keys():
+                    if (raw_trajs_frequent_pattern[list(raw_trajs_frequent_pattern.keys())[i]] >= raw_trajs_frequent_pattern[list(raw_trajs_frequent_pattern.keys())[j]]
+                        and sd_trajs_frequent_pattern[list(raw_trajs_frequent_pattern.keys())[i]] > sd_trajs_frequent_pattern[list(raw_trajs_frequent_pattern.keys())[j]]) \
+                            or (raw_trajs_frequent_pattern[list(raw_trajs_frequent_pattern.keys())[i]] < raw_trajs_frequent_pattern[list(raw_trajs_frequent_pattern.keys())[j]]
+                                and sd_trajs_frequent_pattern[list(raw_trajs_frequent_pattern.keys())[i]] < sd_trajs_frequent_pattern[list(raw_trajs_frequent_pattern.keys())[j]]):
+                        concordant_count += 1
                     else:
-                        discor_count += 1
+                        discordant_count += 1
 
-    # 对于所有数据集
-    # union_ = extra_same_elem(list(init_dict.keys()), list(sd_dict.keys()))
-    # for key in range(len(union_)-1):
-    #     for key2 in range(key+1, len(union_)):
-    #         if (init_dict[union_[key]] >= init_dict[union_[key2]] and sd_dict[
-    #             union_[key]] > sd_dict[union_[key2]]) or \
-    #                 (init_dict[union_[key]] < init_dict[union_[key2]] and sd_dict[
-    #                     union_[key]] < sd_dict[union_[key2]]):
-    #             concor_count += 1
-    #         else:
-    #             discor_count += 1
-    # print("KT差值：", (concor_count - discor_count))
-    KT = (concor_count - discor_count) / (50 * 49 / 2)
+    KT = (concordant_count - discordant_count) / (50 * 49 / 2)
+
     return KT
 
 
-def get_check(init_path='../../data/Geolife Trajectories 1.3/Trajectories7000/',
-              min_latitude=39.6001216362634, min_longitude=115.80024136052477,
-              len_latitude=1.2006028726893376, len_longitude=1.6006907968450292):
-    """
-    存储数据的频繁模式
-    :param init_path:数据路径
-    :param min_latitude:最小纬度
-    :param min_longitude:最小经度
-    :param len_latitude:纬度差值
-    :param len_longitude:经度差值
-    :param para:计算频繁模式,选择数据集
-    :return:排序好的频繁模式集
-    """
+def run(epsilon):
+    with open(f'../data/{USE_DATA}/GPS_trajs_range.pkl', 'rb') as GPS_trajs_range_file:
+        GPS_trajs_range = pickle.loads(GPS_trajs_range_file.read())
 
-    lat_accu = len_latitude / 6  # 维度边的跨度
-    lon_accu = len_longitude / 6  # 经度边的跨度
+    save_frequent_pattern(f'../data/{USE_DATA}/Trajectories/',
+                          min_latitude=MIN_LAT_LON[USE_DATA][0],
+                          min_longitude=MIN_LAT_LON[USE_DATA][1],
+                          len_latitude=GPS_trajs_range[0][1] - GPS_trajs_range[0][0],
+                          len_longitude=GPS_trajs_range[1][1] - GPS_trajs_range[1][0],
+                          traj_type="raw", epsilon=epsilon)
 
-    # 存频繁模式
-    Frequent_Pattern = {}
+    raw_trajs_frequent_pattern = get_frequent_pattern(traj_type="raw", epsilon=epsilon)
 
-    base_path_list = os.listdir(init_path)
-    base_path_list2 = os.listdir('../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep0.1/')
-    for i in range(len(base_path_list)):
-        file_object = open(init_path + base_path_list[i], 'r')  # 读取轨迹数据文件
-        file_object2 = open('../../data/Geolife Trajectories 1.3/sd/sd_final_MDL1100_ep0.1/' + base_path_list2[i], 'r')
-        T0 = []
-        T1 = []
-        l0 = []
-        l1 = []
-        k0 = []
-        k1 = []
+    save_frequent_pattern(f'../data/{USE_DATA}/SD/sd_final_epsilon_{epsilon}/',
+                          min_latitude=MIN_LAT_LON[USE_DATA][0],
+                          min_longitude=MIN_LAT_LON[USE_DATA][1],
+                          len_latitude=GPS_trajs_range[0][1] - GPS_trajs_range[0][0],
+                          len_longitude=GPS_trajs_range[1][1] - GPS_trajs_range[1][0],
+                          traj_type="sd", epsilon=epsilon)
 
-        for line in file_object.readlines():
-            w = float(line.strip().split(',')[0].strip()[:5])
-            w = int((w - min_latitude) / lat_accu)  # 维度对应网格的位置
-            j = float(line.strip().split(',')[1].strip()[:6])
-            j = int((j - min_longitude) / lon_accu)  # 经度对应网格的位置
-            l0.append((w, j))
-            k0.append((float(line.strip().split(',')[0].strip()[:5]) - min_latitude,
-                       float(line.strip().split(',')[1].strip()[:6]) - min_longitude))
-            if len(T0) > 0 and w * 6 + j == T0[-1]:  # 排除连续出现在一个格子里面的情况
-                continue
-            if w * 6 + j in T0:
-                continue
-            T0.append(w * 6 + j)  # 格子的编号
+    sd_trajs_frequent_pattern = get_frequent_pattern(traj_type="sd", epsilon=epsilon)
 
-        for line1 in file_object2.readlines():
-            w = float(line1.strip().split(',')[0].strip())
-            w = int((w - min_latitude) / lat_accu)  # 维度对应网格的位置
-            j = float(line1.strip().split(',')[1].strip())
-            j = int((j - min_longitude) / lon_accu)  # 经度对应网格的位置
-            l1.append((w, j))
-            k1.append((float(line1.strip().split(',')[0].strip()) - min_latitude,
-                       float(line1.strip().split(',')[1].strip()) - min_longitude))
-            if len(T1) > 0 and w * 6 + j == T1[-1]:  # 排除连续出现在一个格子里面的情况
-                continue
-            if w * 6 + j in T1:
-                continue
-            T1.append(w * 6 + j)  # 格子的编号
-        print(l0)
-        print(l1)
-        print(T0)
-        print(T1)
-        print(k0)
-        input(k1)
+    FP = cal_fps(raw_trajs_frequent_pattern, sd_trajs_frequent_pattern)
+    KT = cal_kt(raw_trajs_frequent_pattern, sd_trajs_frequent_pattern)
 
-
-def get_data2():
-    f = open("Frequent_Pattern_init.txt", "r")
-    count = []
-    for line in f.readlines():
-        count.append(line.strip().split(":")[-1])
-    f.close()
-    print(count)
+    print('epsilon: %f. FP: %f. KT: %f' % (epsilon, FP, KT))
 
 
 if __name__ == '__main__':
-    get_Frequent_Pattern(path_list[0],
-                         min_latitude=39.6,
-                         min_longitude=115.8,
-                         len_latitude=1.2,
-                         len_longitude=1.6,
-                         para="init")
-    dict_init = get_Fredata(para="init")
-
-    for i in range(1, len(path_list)):
-        get_Frequent_Pattern(path_list[i],
-                             min_latitude=39.6,
-                             min_longitude=115.8,
-                             len_latitude=1.2,
-                             len_longitude=1.6,
-                             para="sd")
-        dict_sd = get_Fredata(para="sd")
-        FP = get_FP(dict_init, dict_sd)
-        KT = get_KT(dict_init, dict_sd)
-        print(path_list[i], FP, KT)
-        input()
-    get_data2()
+    Parallel(n_jobs=4)(delayed(run)(epsilon=i) for i in epsilon_list)

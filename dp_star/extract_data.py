@@ -61,7 +61,7 @@ def extract_dataset(lat_lon, trajs_name_file, init_path, base_path, rand_num):
                         if line_count > 1:
                             now_time = now_line_time
                             t_interval = cal_time_interval(prev_time, now_time)
-                            if t_interval > 120:
+                            if t_interval > 6500:
                                 # 轨迹间隔超过一定范围, 退出读取
                                 break
                         prev_time = now_line_time

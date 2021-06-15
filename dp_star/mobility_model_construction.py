@@ -17,32 +17,32 @@ from utils import ProgressBar
 def markov_model(trajs: list, n_grid: int, _epsilon: float) -> np.ndarray:
     """
 
-    马尔可夫模型
+    markov model
 
     Args:
-        trajs   : 轨迹数据(二维数组)
-        n_grid  : 二级网格数
-        _epsilon: 隐私预算
+        trajs   : trajectory data
+        n_grid  : number of secondary grids
+        _epsilon: privacy budget
 
     Returns:
-        O_: 中间点转移概率矩阵
+        O_: intermediate point transition probability matrix
 
     """
-    O_ = np.zeros((n_grid, n_grid))  # 建立 n_grid * n_grid 的转移概率矩阵
+    O_ = np.zeros((n_grid, n_grid))  # establish n_grid * n_grid transition probability matrix
     for t in trajs:
         O_sub = np.zeros((n_grid, n_grid))
         for i in range(len(t) - 1):
             curr_point = t[i]
             next_point = t[i + 1]
             O_sub[curr_point][next_point] += 1
-        O_sub /= (len(t) - 1)  # 该轨迹的转移概率
+        O_sub /= (len(t) - 1)  # transition probability of the trajectory
         O_ += O_sub
 
-    p = ProgressBar(n_grid, '生成中间点转移概率矩阵')
+    p = ProgressBar(n_grid, 'Generate midpoint transition probability matrix')
     for i in range(n_grid):
         p.update(i)
         for j in range(n_grid):
-            noise = np.random.laplace(0, 1 / _epsilon)  # 添加拉普拉斯噪声
+            noise = np.random.laplace(0, 1 / _epsilon)  # add laplacian noise
             O_[i][j] += noise
 
             if O_[i][j] < 0:
@@ -60,19 +60,19 @@ def mobility_model_main(n_grid: int, _epsilon: float, grid_trajs_path: str,
                         midpoint_movement_path: str):
     """
 
-    主函数
+    main function
 
     Args:
-        n_grid                : 网格数
-        _epsilon              : 隐私预算
-        grid_trajs_path       : 网格轨迹文件路径
-        midpoint_movement_path: 中间点转移概率矩阵文件路径
+        n_grid                : number of grids
+        _epsilon              : privacy budget
+        grid_trajs_path       : grid track file path
+        midpoint_movement_path: midpoint transition probability matrix file path
 
     Returns:
 
     """
     with open(grid_trajs_path, 'r') as grid_trajs_file:
-        T = [eval(traj) for traj in grid_trajs_file.readlines()]  # 网格轨迹数据(list)
+        T = [eval(traj) for traj in grid_trajs_file.readlines()]
         with open(midpoint_movement_path, 'w') as midpoint_movement_file:
             midpoint_movement_matrix = markov_model(T, n_grid, _epsilon)
             for item in midpoint_movement_matrix:
