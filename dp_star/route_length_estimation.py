@@ -19,7 +19,7 @@ from utils import ProgressBar
 def exp_mechanism(score, m: int, _epsilon: float, sensitivity: float) -> int:
     """
 
-    指数机制，选出一个符合定义的下标
+    index mechanism
 
     Args:
         score      :
@@ -58,7 +58,7 @@ def route_length_estimate(trajs: list, n_grid: int, lo, hi: float, _epsilon: flo
                           sensitivity: float) -> list:
     """
 
-    轨迹长度估计
+    trajectory length estimation
 
     Args:
         trajs      :
@@ -73,35 +73,35 @@ def route_length_estimate(trajs: list, n_grid: int, lo, hi: float, _epsilon: flo
 
     """
     C = n_grid * n_grid
-    L_matrix = [[] for _ in range(C)]  # L矩阵
+    L_matrix = [[] for _ in range(C)]
     L = []
 
     for t in trajs:
-        lenT = len(t)
-        if lenT > hi:
+        len_T = len(t)
+        if len_T > hi:
             continue
-        if lenT < 2 or lo > lenT:
+        if len_T < 2 or lo > len_T:
             continue
 
         row = t[0]
         col = t[-1]
-        l_index = row * n_grid + col  # 转一维坐标
-        L_matrix[l_index].append(lenT)
+        l_index = row * n_grid + col  # turn one dimensional coordinates
+        L_matrix[l_index].append(len_T)
 
-    p = ProgressBar(C, '计算轨迹中值长度矩阵')
+    p = ProgressBar(C, 'Calculate the median length matrix of the trajectory')
     for i in range(C):
         p.update(i)
         score_arr = []
-        K = L_matrix[i].copy()  # 取一种头尾轨迹的所有轨迹长
-        K.sort()  # 顺序排序
+        K = L_matrix[i].copy()  # take all the trajectory lengths of a head and tail trajectory
+        K.sort()  # order sort
         if len(K) < 1:
             L.append(0)
             continue
-        m_index = len(K) / 2  # 中值下标
+        m_index = len(K) / 2  # median subscript
+
         for j in range(len(K)):
-            score_arr.append(-abs(j - m_index))  # 得分函数
+            score_arr.append(-abs(j - m_index))  # scoring function
         r_index = exp_mechanism(score_arr, len(K), _epsilon, sensitivity)
-        # print(K, '--->', K[r_index])
         L.append(K[r_index])
 
     return L
@@ -111,22 +111,22 @@ def route_length_estimate_main(n_grid: int, _epsilon: float, grid_trajs_path: st
                                routes_length_path: str) -> int:
     """
 
-    主函数
+    route length estimate (main function)
 
     Args:
-        n_grid            : 网格数
-        _epsilon          : 隐私预算
-        grid_trajs_path   : 网格轨迹文件路径
-        routes_length_path: 轨迹长度估计文件路径
+        n_grid            : number of grids
+        _epsilon          : privacy budget
+        grid_trajs_path   : grid trajectory file path
+        routes_length_path: path length estimation file path
 
     Returns:
-        maxT: 最大轨迹长度
+        maxT: maximum trajectory length
 
     """
     with open(grid_trajs_path, 'r') as grid_trajs_file:
-        # 网格轨迹数据(list)
         T = [eval(grid_traj) for grid_traj in grid_trajs_file.readlines()]
         maxT = max([len(i) for i in T])
+
         with open(routes_length_path, 'w') as routes_length_file:
             l_array = route_length_estimate(T, n_grid, 0, 1.25 * maxT, _epsilon, 1.0)
             len_modify_func = lambda x: x if x >= 2 else 2
@@ -139,7 +139,7 @@ def route_length_estimate_main(n_grid: int, _epsilon: float, grid_trajs_path: st
                     else:
                         routes_length_file.write(str(arr[i]) + '\n')
 
-    print('最大网格轨迹长度: %d' % maxT)
+    print('maximum grid trajectory length: %d' % maxT)
 
     return maxT
 
