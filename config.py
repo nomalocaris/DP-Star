@@ -1,8 +1,7 @@
 """
 -------------------------------------
 # -*- coding: utf-8 -*-
-# @Author  :
-             nomalocaris
+# @Author  : nomalocaris
              Giyn
 # @File    : config.py
 # @Software: PyCharm
