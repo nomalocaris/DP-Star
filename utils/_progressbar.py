@@ -11,9 +11,11 @@ import time
 
 
 class ProgressBar(object):
-    """the bar status for Progress
     """
 
+    the bar status for Progress
+
+    """
     def __init__(self, _tot_pace, _state=None):
         """init the total num of progress
         """
@@ -25,7 +27,7 @@ class ProgressBar(object):
         self._state_end = ' | (pass : %8s | remain : %8s)'
 
         self._time_base = None
-        self._time_pair = {'p': time.time(), 'n': time.time()}  # p means privous and n means now
+        self._time_pair = {'p': time.time(), 'n': time.time()}  # p means previous and n means now
 
     @staticmethod
     def _format_time(time_in_sec):
@@ -80,7 +82,7 @@ class ProgressBar(object):
 
 
 if __name__ == '__main__':
-    p1 = ProgressBar(200, '测试用例1')
+    p1 = ProgressBar(200, 'Test case 1')
     for i in range(200):
         time.sleep(0.1)
         p1.update(i)
